@@ -11,7 +11,7 @@ You may clean up data tables, but do not change student choices
 
 Schedule a Student for 5 Session (giving as many of their choices as possible)
 
-**Goal / Objective...
+Goal / Objective:
 
 To design and code an algorithm that:
 
