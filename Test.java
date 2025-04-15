@@ -13,7 +13,7 @@ public class Test{
         //Try catch block for file reading with fileExceptionError Catch
         try {
             //Creation of scanner, file object and index counter
-            File studentChoice = new File("studentChoice.csv");
+            File studentChoice = new File("csv/studentChoice.csv");
             Scanner scan = new Scanner(studentChoice);
             //Start at -1 to make it easy to get rid of first line of title columns when reading
             int studentIndex = -1;
@@ -99,16 +99,21 @@ public class Test{
         }
         */
 
-        //Sort Tally
+        //Bubble Sort Tally
+        //Create 2D array of Tally
         int tallyTwo[][] = new int[18][2];
+        //Insert all previous data of tally into 2d array
         for(int i = 0; i < 18; i++){
             tallyTwo[i][0] = i+1;
             tallyTwo[i][1] = tally[i];
         }
+
+        //temp var
         int currLargest;
         for(int i = 0; i < tallyTwo.length; i++){
             currLargest = tallyTwo[i][1];
             for(int j = i; j < tallyTwo.length; j++){
+                //Switch both sesion number  values if participants is greater in another array
                 if(tallyTwo[j][1] > currLargest){
                     currLargest = tallyTwo[j][1];
                     tallyTwo[j][1] = tallyTwo[i][1];
