@@ -8,9 +8,43 @@ public class SeniorSeminar {
     ArrayList<Student> students = new ArrayList<Student>();
     ArrayList<Seminar> seminars = new ArrayList<Seminar>();
 
+    Seminar[][] unweightedSchedule = new Seminar[5][5];
+    Seminar[][] weightedSchedule = new Seminar[5][5];
+
+    int[][] tally = new int[18][2];
+
     public SeniorSeminar(){
 
     }
+
+    public void sortTally(){
+        //Initialize tally with sessionID values
+        for(int i = 0; i < 18; i++){
+            tally[i][0] = i+1;
+            System.out.println(tally[i][1]);
+        }
+        //temp var
+        int currLargest;
+        for(int i = 0; i < tally.length; i++){
+            currLargest = tally[i][1];
+            for(int j = i; j < tally.length; j++){
+                //Switch both sesion number  values if participants is greater in another array
+                if(tally[j][1] > currLargest){
+                    currLargest = tally[j][1];
+                    tally[j][1] = tally[i][1];
+                    tally[i][1] = currLargest;
+                    int temp = tally[j][0];
+                    tally[j][0] = tally[i][0];
+                    tally[i][0] = temp;
+                }
+            }
+        }
+
+        for(int i = 0; i < tally.length; i++){
+            System.out.print(tally[i][0] + "  ");
+        }
+    }
+
     
     public void loadCSV(){
         //Creates Student objects from the file and adds them into students ArrayList
@@ -33,6 +67,10 @@ public class SeniorSeminar {
                     outer: for(int i = 3, arrayIndex = 0; i < splitStr.length; i++, arrayIndex++){
                         try{
                             choice[arrayIndex] = Integer.parseInt(splitStr[i]);
+                            //Count seminar choice into tally 2D Array (subtract one to match array indexing)
+                            if(Integer.parseInt(splitStr[i]) != -1){
+                                tally[Integer.parseInt(splitStr[i])-1][1]++;
+                            }
                         }
                         catch(NumberFormatException e){
                         }
@@ -66,6 +104,7 @@ public class SeniorSeminar {
                     
                     Seminar tempSeminar = new Seminar(sessionName, sessionID, presenterName);
                     seminars.add(tempSeminar);
+                    
                 }
                 studentIndex++;
             }
@@ -79,6 +118,7 @@ public class SeniorSeminar {
 
     public void runSeniorSeminar(){
         loadCSV();
+        sortTally();
     }
 
     public void createUnweightedSchedule(){
