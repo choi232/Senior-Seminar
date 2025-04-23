@@ -80,12 +80,11 @@ public class SeniorSeminar {
             sortedSeminars.set(currMinIndex, temp);
         }
     }
-    public boolean isPlaced(int choice, int[] placed){
-        boolean returnValue = false;
+    public boolean isPlaced(int choice, Seminar[] placed){
         for(int i = 0; i < 5; i++){
-            if(placed[i] == choice) returnValue = true;
+            if(placed[i] == null && placed[i].getSessionID() == choice) return true;
         }
-        return returnValue;
+        return false;
     }
     //public double placeStudents(Seminar[][] schedule){
     public double placeStudents(){
@@ -102,22 +101,24 @@ public class SeniorSeminar {
             Student currStudent = sortedStudents.get(studentID);
             int coursesPlaced = 0;
             int[] choice = currStudent.getChoice();
-            int[] placed = new int[5];
+            Seminar[] placed = currStudent.getPlacedSeminars();
+
             for(int row = 0; row < 5; row++){
                 boolean isFilled = false;
                 outer: for(int col = 0; col < 5; col++){
                     for(int rank = 0; rank < 5; rank++){
+                        
                         if(choice[rank] == schedule[row][col].getSessionID() && !isPlaced(choice[rank], placed)){
                             currStudent.setPlacedSeminar(coursesPlaced, schedule[row][col]);
                             schedule[row][col].setUnweightedStudent(schedule[row][col].getUnweightedCounter(), currStudent);
                             schedule[row][col].decrementPlacability();
-                            if(schedule[row][col].getUnweightedCounter() > 16) System.out.println("DSF");
-                            placed[coursesPlaced] = choice[coursesPlaced];
+                            placed[coursesPlaced] = schedule[row][col]; 
                             isFilled = true;
                             coursesPlaced++;
                             //cannot select more than one seminar in the same time slot so once selected break
                             break outer;
                         }
+                        
                     }   
                 }
                 if(!isFilled){
@@ -127,6 +128,7 @@ public class SeniorSeminar {
                     }
                     Seminar maxSeminar = sortedSeminars.get(index);
                     currStudent.setPlacedSeminar(coursesPlaced, maxSeminar);
+                    placed[coursesPlaced] = maxSeminar;
                     coursesPlaced++;
                     System.out.println(currStudent.getStudentID());
                     //Add student into max
