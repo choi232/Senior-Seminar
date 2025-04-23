@@ -11,6 +11,7 @@ public class SeniorSeminar {
     Seminar[][] unweightedSchedule = new Seminar[5][5];
     Seminar[][] weightedSchedule = new Seminar[5][5];
 
+    ArrayList<Student> sortedStudents = students;
     Seminar[][] test = new Seminar[5][5];
 
     int[][] tally = new int[18][3];
@@ -45,10 +46,27 @@ public class SeniorSeminar {
                 else placability = 16*25;
             }
             currStudent.setPlacability(placability);
-            System.out.println(currStudent.getPlacability());
         }
 
-        //
+        //Sort each student by placability with selection sort from lowest to highest
+
+        for(int i = 0, len = sortedStudents.size(); i < len; i++){
+            int currMinIndex = i;
+            int currMinimum = sortedStudents.get(i).getPlacability();
+
+            for(int j = i; j < sortedStudents.size(); j++){
+                Student currStudent = sortedStudents.get(j);
+                if(currStudent.getPlacability() < currMinimum){
+                    currMinimum = currStudent.getPlacability();
+                    currMinIndex = j;
+                }
+            }
+            Student temp = sortedStudents.get(i);
+            sortedStudents.set(i, sortedStudents.get(currMinIndex));
+            sortedStudents.set(currMinIndex, temp);
+        }
+
+
 
     }
     public double placeStudents(Seminar[][] schedule){
