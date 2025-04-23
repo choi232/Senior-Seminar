@@ -2,12 +2,14 @@ public class Seminar {
     String sessionName;
     int sessionID;
     String presenterName;
+    int spots;
     Student[] unweightedStudents = new Student[5];
     Student[] weightedStudents = new Student[5];
-    public Seminar(String setSessionName, int setSessionID, String setPresenterName){
+    public Seminar(String setSessionName, int setSessionID, String setPresenterName, int setSpots){
         sessionName = setSessionName;
         sessionID = setSessionID;
         presenterName = setPresenterName;
+        spots = setSpots;
     }
 
     public String getSessionName(){
