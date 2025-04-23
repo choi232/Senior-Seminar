@@ -7,6 +7,7 @@ public class Student{
     private int studentID;
     private int[] choice = new int[5];
     private Seminar[] seminars = new Seminar[5];
+    private int placability;
 
     public Student(String setName, String setEmail, String setTime, int setStudentID, int[] setChoice){
         name = setName;
@@ -14,6 +15,14 @@ public class Student{
         time = setTime;
         choice = setChoice;
         studentID = setStudentID;
+    }
+
+    public void setPlacability(int setPlacability){
+        placability = setPlacability;
+    }
+
+    public int getPlacability(){
+        return placability;
     }
 
     public Seminar getSeminar(int index){

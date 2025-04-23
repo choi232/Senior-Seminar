@@ -3,6 +3,7 @@ public class Seminar {
     int sessionID;
     String presenterName;
     int spots;
+    int placability;
     Student[] unweightedStudents = new Student[5];
     Student[] weightedStudents = new Student[5];
     public Seminar(String setSessionName, int setSessionID, String setPresenterName, int setSpots){
@@ -10,6 +11,20 @@ public class Seminar {
         sessionID = setSessionID;
         presenterName = setPresenterName;
         spots = setSpots;
+    }
+
+
+    public void incrementPlacability(){
+        placability++;
+    }
+    public void setPlacability(int setPlacability){
+        placability = setPlacability;
+    }
+    public int getPlacability(){
+        return placability;
+    }
+    public int getSpots(){
+        return spots;
     }
 
     public String getSessionName(){

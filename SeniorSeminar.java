@@ -27,7 +27,28 @@ public class SeniorSeminar {
             }
         }
     }
-    public void calculatePlacability(){
+    public void runSeniorSeminar(){
+        loadCSV();
+        sortTally();
+        sortStudentsByPlacability();
+        //initializeTestSchedule();
+    }
+    public void sortStudentsByPlacability(){
+        //Calculate placability of each student
+        
+        for(int studentID = 0; studentID < students.size(); studentID++){
+            int placability = 0;
+            Student currStudent = students.get(studentID);
+            int[] choice = currStudent.getChoice();
+            for(int rank = 0; rank < choice.length; rank++){
+                if(choice[rank] != -1) placability += seminars.get(choice[rank]-1).getPlacability();
+                else placability = 16*25;
+            }
+            currStudent.setPlacability(placability);
+            System.out.println(currStudent.getPlacability());
+        }
+
+        //
 
     }
     public double placeStudents(Seminar[][] schedule){
@@ -75,9 +96,11 @@ public class SeniorSeminar {
             }
         }
 
-        for(int i = 0; i < tally.length; i++){
-            System.out.print(tally[i][1] + "(" + seminars.get(tally[i][0]-1).getSessionID() + ")    ");
+        /*for(int i = 0; i < tally.length; i++){
+            tally[i][3] = seminars.get(tally[i][0]-1).getSpots()-tally[i][1];
+            System.out.print(tally[i][1] + "(" + (seminars.get(tally[i][0]-1).getSpots()-tally[i][1]) + ")    ");
         }
+            */
     }
 
     public void updateTally(){
@@ -102,8 +125,9 @@ public class SeniorSeminar {
                     int sessionID = Integer.parseInt(splitStr[1]);
                     String presenterName = splitStr[2];
                     int spots = Integer.parseInt(splitStr[3]);
-
+                    
                     Seminar tempSeminar = new Seminar(sessionName, sessionID, presenterName, spots);
+                    tempSeminar.setPlacability(-1*spots);
                     seminars.add(tempSeminar);
                     
                 }
@@ -139,6 +163,7 @@ public class SeniorSeminar {
                             //Count seminar choice into tally 2D Array (subtract one to match array indexing)
                             if(Integer.parseInt(splitStr[i]) != -1){
                                 tally[Integer.parseInt(splitStr[i])-1][1]++;
+                                seminars.get(Integer.parseInt(splitStr[i])-1).incrementPlacability();
                             }
                         }
                         catch(NumberFormatException e){
@@ -157,11 +182,7 @@ public class SeniorSeminar {
         }
     }
 
-    public void runSeniorSeminar(){
-        loadCSV();
-        sortTally();
-        //initializeTestSchedule();
-    }
+
 
     public void createUnweightedSchedule(){
 
