@@ -6,7 +6,7 @@ public class Student{
     private String time;
     private int studentID;
     private int[] choice = new int[5];
-    private Seminar[] seminars = new Seminar[5];
+    private Seminar[] placedSeminars = new Seminar[5];
     private int placability;
 
     public Student(String setName, String setEmail, String setTime, int setStudentID, int[] setChoice){
@@ -15,6 +15,21 @@ public class Student{
         time = setTime;
         choice = setChoice;
         studentID = setStudentID;
+        // Seminar dummy = new Seminar("N/A", -1, "N/A", -1);
+        // for(int i = 0; i < 5; i++){
+        //     placedSeminars[i] = dummy;
+        // }
+    }
+
+    public Seminar[] getPlacedSeminars(){
+        return placedSeminars;
+    }
+    public Seminar getPlacedSeminar(int index){
+        return placedSeminars[index];
+    }
+
+    public void setPlacedSeminar(int index, Seminar setSeminar){
+        placedSeminars[index] = setSeminar;
     }
 
     public void setPlacability(int setPlacability){
@@ -23,14 +38,6 @@ public class Student{
 
     public int getPlacability(){
         return placability;
-    }
-
-    public Seminar getSeminar(int index){
-        return seminars[index];
-    }
-
-    public void setSeminar(int index, Seminar setSeminarVar){
-        seminars[index] = setSeminarVar;
     }
 
     public String getName(){
