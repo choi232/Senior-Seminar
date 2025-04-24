@@ -1,4 +1,3 @@
-import java.awt.Choice;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
