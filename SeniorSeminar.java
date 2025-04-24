@@ -8,9 +8,6 @@ public class SeniorSeminar {
     ArrayList<Student> students = new ArrayList<Student>();
     ArrayList<Seminar> seminars = new ArrayList<Seminar>();
 
-    Seminar[][] unweightedSchedule = new Seminar[5][5];
-    Seminar[][] weightedSchedule = new Seminar[5][5];
-
     ArrayList<Student> sortedStudents = students;
     ArrayList<Seminar> sortedSeminars = seminars;
     Seminar[][] test;
