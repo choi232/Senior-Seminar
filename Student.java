@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 
 public class Student{
 
@@ -5,31 +6,24 @@ public class Student{
     private String email;
     private String time;
     private int studentID;
-    private int[] choice = new int[5];
-    private Seminar[] placedSeminars = new Seminar[5];
+    private ArrayList<Integer> choice;
+    private Seminar[] seminars = new Seminar[5];
     private int placability;
 
-    public Student(String setName, String setEmail, String setTime, int setStudentID, int[] setChoice){
+    public Student(String setName, String setEmail, String setTime, int setStudentID, ArrayList<Integer> setChoice){
         name = setName;
         email = setEmail;
         time = setTime;
         choice = setChoice;
         studentID = setStudentID;
-        // Seminar dummy = new Seminar("N/A", -1, "N/A", -1);
-        // for(int i = 0; i < 5; i++){
-        //     placedSeminars[i] = dummy;
-        // }
     }
 
-    public Seminar[] getPlacedSeminars(){
-        return placedSeminars;
-    }
-    public Seminar getPlacedSeminar(int index){
-        return placedSeminars[index];
+    public Seminar getSeminar(int index){
+        return seminars[index];
     }
 
-    public void setPlacedSeminar(int index, Seminar setSeminar){
-        placedSeminars[index] = setSeminar;
+    public void setSeminar(int index, Seminar setSeminar){
+        seminars[index] = setSeminar;
     }
 
     public void setPlacability(int setPlacability){
@@ -52,8 +46,11 @@ public class Student{
         return time;
     }
 
-    public int[] getChoice(){
-        return choice;
+    public int getChoice(int index){
+        return choice.get(index);
+    }
+    public int getChoiceSize(int index){
+        return choice.size();
     }
 
     public int getStudentID(){

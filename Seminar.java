@@ -2,42 +2,48 @@ public class Seminar {
     String sessionName;
     int sessionID;
     String presenterName;
-    int spots;
-    int placability;
-    Student[] unweightedStudents = new Student[16];
-    int unweightedCounter = 0;
-    Student[] weightedStudents = new Student[16];
-    int weightedCounter = 0;
-    public Seminar(String setSessionName, int setSessionID, String setPresenterName, int setSpots){
+
+    int placability = 16;
+    int numEnrolled = 0;
+    Student[] students = new Student[16];
+    int studentsIndex = 0;
+    boolean duplicate = false;
+
+    public Seminar(String setSessionName, int setSessionID, String setPresenterName){
         sessionName = setSessionName;
         sessionID = setSessionID;
         presenterName = setPresenterName;
-        spots = setSpots;
+    }
+    public void setDuplicate(boolean val){
+        duplicate = val;
+    }
+    public boolean getDuplicate(){
+        return duplicate;
     }
 
-    public int getUnweightedCounter(){
-        return unweightedCounter;
+    public int getStudentsIndex(){
+        return studentsIndex;
     }
 
-
-    public int getWeightedCounter(){
-        return weightedCounter;
+    public void incrementNumEnrolled(int step){
+        numEnrolled += step;
     }
 
-    public void incrementPlacability(){
-        placability++;
+    public int getNumEnrolled(){
+        return numEnrolled;
     }
-    public void decrementPlacability(){
-        placability--;
-    }
+
     public void setPlacability(int setPlacability){
         placability = setPlacability;
     }
+
+    //Overloaded method of setPlacability to just increment/decrement by set value
+    public void incrementPlacability(int step){
+        placability += step;
+    }
+
     public int getPlacability(){
         return placability;
-    }
-    public int getSpots(){
-        return spots;
     }
 
     public String getSessionName(){
@@ -52,25 +58,5 @@ public class Seminar {
         return presenterName;
     }
 
-    public Student getWeightedStudent(int index){
-        return weightedStudents[index];
-    }
 
-    public void setWeightedStudent(int index, Student student){
-        weightedStudents[index] = student;
-    }
-
-    public Student getUnweightedStudent(int index){
-        return unweightedStudents[index];
-    }
-
-    public void setUnweightedStudent(int index, Student student){
-        unweightedStudents[index] = student;
-        // if(weightedCounter > 16) return -1;
-        // else {
-        //     unweightedStudents[index] = student;
-        //     weightedCounter++;
-        //     return 0;
-        // }
-    }
 }

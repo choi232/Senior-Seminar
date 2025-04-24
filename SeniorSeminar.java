@@ -1,3 +1,4 @@
+import java.awt.Choice;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -23,27 +24,30 @@ public class SeniorSeminar {
 
     public void runSeniorSeminar(){
         loadCSV();
-        sortTally();
-        sortStudentsByPlacability(0);
-        placeStudents();
+        //sortTally();
+        //sortByPlacability("student", 0);
     }
 
-    public void calculatePlacability(int startIndex){
+    public void calculatePlacability(String type, int startIndex){
         //Calculate placability of each student
-        
-        for(int studentID = startIndex; studentID < students.size(); studentID++){
-            int placability = 0;
-            Student currStudent = students.get(studentID);
-            int[] choice = currStudent.getChoice();
-            for(int rank = 0; rank < choice.length; rank++){
-                if(choice[rank] != -1) placability += seminars.get(choice[rank]-1).getPlacability();
-                else placability = 16*25;
+        if(type.equals("student")){
+            for(int studentID = startIndex; studentID < students.size(); studentID++){
+                int placability = 0;
+                Student currStudent = students.get(studentID);
+                int[] choice = currStudent.getChoice();
+                for(int rank = 0; rank < choice.length; rank++){
+                    if(choice[rank] != -1) placability += seminars.get(choice[rank]-1).getPlacability();
+                    else placability = 16*25;
+                }
+                currStudent.setPlacability(placability);
             }
-            currStudent.setPlacability(placability);
+        }
+        else if (type.equals("seminar")){
+
         }
     }
-    public void sortStudentsByPlacability(int startIndex){
-        calculatePlacability(startIndex);
+    public void sortByPlacability(String type, int startIndex){
+        calculatePlacability(type, startIndex);
 
         //Sort each student by placability with selection sort from lowest to highest
 
@@ -80,91 +84,7 @@ public class SeniorSeminar {
             sortedSeminars.set(currMinIndex, temp);
         }
     }
-    public boolean isPlaced(int choice, Seminar[] placed){
-        for(int i = 0; i < 5; i++){
-            if(placed[i] == null && placed[i].getSessionID() == choice) return true;
-        }
-        return false;
-    }
-    //public double placeStudents(Seminar[][] schedule){
-    public double placeStudents(){
-        Seminar[][] schedule = {{seminars.get(1-1), seminars.get(14-1), seminars.get(10-1), seminars.get(4-1), seminars.get(7-1)},
-        {seminars.get(2-1), seminars.get(3-1), seminars.get(11-1), seminars.get(15-1), seminars.get(16-1)},
-        {seminars.get(15-1), seminars.get(18-1), seminars.get(13-1), seminars.get(6-1), seminars.get(9-1)},
-        {seminars.get(16-1), seminars.get(6-1), seminars.get(12-1), seminars.get(18-1), seminars.get(2-1)},
-        {seminars.get(7-1), seminars.get(9-1), seminars.get(5-1), seminars.get(3-1), seminars.get(1-1)}
-        };  
-
-
-        //iterates through every student
-        for(int studentID = 0; studentID < sortedStudents.size(); studentID++){
-            Student currStudent = sortedStudents.get(studentID);
-            int coursesPlaced = 0;
-            int[] choice = currStudent.getChoice();
-            Seminar[] placed = currStudent.getPlacedSeminars();
-
-            for(int row = 0; row < 5; row++){
-                boolean isFilled = false;
-                outer: for(int col = 0; col < 5; col++){
-                    for(int rank = 0; rank < 5; rank++){
-                        
-                        if(choice[rank] == schedule[row][col].getSessionID() && !isPlaced(choice[rank], placed)){
-                            currStudent.setPlacedSeminar(coursesPlaced, schedule[row][col]);
-                            schedule[row][col].setUnweightedStudent(schedule[row][col].getUnweightedCounter(), currStudent);
-                            schedule[row][col].decrementPlacability();
-                            placed[coursesPlaced] = schedule[row][col]; 
-                            isFilled = true;
-                            coursesPlaced++;
-                            //cannot select more than one seminar in the same time slot so once selected break
-                            break outer;
-                        }
-                        
-                    }   
-                }
-                if(!isFilled){
-                    int index = sortedSeminars.size()-1;
-                    while(isPlaced(sortedSeminars.get(index).getSessionID(), placed)){
-                        index--;
-                    }
-                    Seminar maxSeminar = sortedSeminars.get(index);
-                    currStudent.setPlacedSeminar(coursesPlaced, maxSeminar);
-                    placed[coursesPlaced] = maxSeminar;
-                    coursesPlaced++;
-                    System.out.println(currStudent.getStudentID());
-                    //Add student into max
-                    maxSeminar.setUnweightedStudent(maxSeminar.getUnweightedCounter(), currStudent);
-                    maxSeminar.decrementPlacability();
-                }
-            }
-        }
-
-        //Calculate avgCoursePlacement
-        int totalMatchedSeminars = 0;
-        int totalStudents = 0;
-        for(int studentID = 0; studentID < sortedStudents.size(); studentID++){
-            Student currStudent = sortedStudents.get(studentID);
-            int[] choice = currStudent.getChoice();
-            Seminar[] placedSeminars = currStudent.getPlacedSeminars();
-                for(int i = 0; i < choice.length; i++){
-                    for(int j = 0; j < placedSeminars.length; j++){
-                        if(choice[i] != -1 && choice[i] == placedSeminars[j].getSessionID()){
-                            totalMatchedSeminars++;
-                            totalStudents++;
-                        }
-                    }
-                }
-        }
-        double avgCoursePlacement = totalMatchedSeminars/70;
-        for(int studentID = 0; studentID < sortedStudents.size(); studentID++){
-            for(int j = 0; j < 5; j++){
-                System.out.print(sortedStudents.get(studentID).getPlacedSeminar(j).getSessionID() + "   ");
-            }
-            System.out.println();
-        }
-        System.out.println(totalMatchedSeminars);
-        return avgCoursePlacement;
-    }
-
+    
     public void sortTally(){
         //Initialize tally with sessionID values
         for(int i = 0; i < 18; i++){
@@ -217,12 +137,27 @@ public class SeniorSeminar {
                     String presenterName = splitStr[2];
                     int spots = Integer.parseInt(splitStr[3]);
                     
-                    Seminar tempSeminar = new Seminar(sessionName, sessionID, presenterName, spots);
-                    tempSeminar.setPlacability(-1*spots);
-                    seminars.add(tempSeminar);
+                    //If not a seminar decided to be cut
+                    if(spots == 16){
+                        Seminar tempSeminar = new Seminar(sessionName, sessionID, presenterName);
+                        seminars.add(tempSeminar);
+                    }
+                    else if(spots == 32){
+                        Seminar tempSeminar = new Seminar(sessionName, sessionID, presenterName);
+                        tempSeminar.setDuplicate(true);
+                        seminars.add(tempSeminar);
+                    }
                     
                 }
                 studentIndex++;
+            }
+            for(int i = 0, len = seminars.size(); i < len; i++){
+                if(seminars.get(i).getDuplicate()){
+                    Seminar currSeminar = seminars.get(i);
+                    Seminar tempSeminar = new Seminar(currSeminar.getSessionName(), currSeminar.getSessionID()+16, currSeminar.getPresenterName());
+                    tempSeminar.setDuplicate(true);
+                    seminars.add(tempSeminar);
+                }
             }
             scan.close();
         } 
@@ -246,15 +181,19 @@ public class SeniorSeminar {
                     String email = splitStr[1];
                     String name = splitStr[2];
                     int studentID = studentIndex;
-                    int[] choice = new int[5];
+                    ArrayList<Integer> choice = new ArrayList<Integer>();
                     
-                    outer: for(int i = 3, arrayIndex = 0; i < splitStr.length; i++, arrayIndex++){
+                    for(int i = 3; i < splitStr.length; i++){
                         try{
-                            choice[arrayIndex] = Integer.parseInt(splitStr[i]);
+                            int sessionID = Integer.parseInt(splitStr[i]);
+                            choice.add(sessionID);
+                            if(sessionID != -1 && seminars.get(sessionID-1).getDuplicate()){
+                                choice.add(sessionID+9);
+                            }
                             //Count seminar choice into tally 2D Array (subtract one to match array indexing)
                             if(Integer.parseInt(splitStr[i]) != -1){
                                 tally[Integer.parseInt(splitStr[i])-1][1]++;
-                                seminars.get(Integer.parseInt(splitStr[i])-1).incrementPlacability();
+                                seminars.get(Integer.parseInt(splitStr[i])-1).incrementNumEnrolled(1);
                             }
                         }
                         catch(NumberFormatException e){
@@ -270,6 +209,13 @@ public class SeniorSeminar {
         catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
+        }
+
+        for(int i = 0; i < students.size(); i++){
+            for(int j = 0; j < students.get(i).getChoiceSize(); j++){
+                if()
+            }
+            
         }
     }
 
