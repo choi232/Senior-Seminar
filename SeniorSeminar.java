@@ -122,6 +122,7 @@ public class SeniorSeminar {
             File seminarCSV = new File("csv/seminar.csv");
             Scanner scan = new Scanner(seminarCSV);
             int studentIndex = -1;
+            int numDuplicates = 0;
             //while loop which runs through every line of the csv with scan.hasNextLine()
             while (scan.hasNextLine()) { 
                 String data = scan.nextLine();
@@ -140,19 +141,21 @@ public class SeniorSeminar {
                     }
                     else if(spots == 32){
                         Seminar tempSeminar = new Seminar(sessionName, sessionID, presenterName);
-                        tempSeminar.setDuplicate(true);
+                        tempSeminar.setDuplicate(numDuplicates + 19);
                         seminars.add(tempSeminar);
+                        numDuplicates++;
                     }
                     
                 }
                 studentIndex++;
             }
-            for(int i = 0, len = seminars.size(); i < len; i++){
-                if(seminars.get(i).getDuplicate()){
+            for(int i = 0, len = seminars.size(), sessionID = 19; i < len; i++){
+                if(seminars.get(i).getDuplicate() != -1){
                     Seminar currSeminar = seminars.get(i);
-                    Seminar tempSeminar = new Seminar(currSeminar.getSessionName(), currSeminar.getSessionID()+16, currSeminar.getPresenterName());
-                    tempSeminar.setDuplicate(true);
+                    Seminar tempSeminar = new Seminar(currSeminar.getSessionName(), sessionID, currSeminar.getPresenterName());
+                    tempSeminar.setDuplicate(sessionID-18);
                     seminars.add(tempSeminar);
+                    sessionID++;
                 }
             }
             scan.close();
@@ -183,8 +186,9 @@ public class SeniorSeminar {
                         try{
                             int sessionID = Integer.parseInt(splitStr[i]);
                             choice.add(sessionID);
-                            if(sessionID != -1 && seminars.get(sessionID-1).getDuplicate()){
-                                choice.add(sessionID+9);
+                            if(sessionID != -1 && seminars.get(sessionID-1).getDuplicate() != -1){
+                                //Adds duplicate choice into choice ArrayList
+                                choice.add(seminars.get(sessionID-1).getDuplicate());
                             }
                             //Count seminar choice into tally 2D Array (subtract one to match array indexing)
                             if(Integer.parseInt(splitStr[i]) != -1){
@@ -209,9 +213,13 @@ public class SeniorSeminar {
 
         for(int i = 0; i < students.size(); i++){
             for(int j = 0; j < students.get(i).getChoiceSize(); j++){
-                if()
+                System.out.print(students.get(i).getChoice(j) + "   ");
             }
-            
+            System.out.println("");
+        }
+
+        for(int i = 0; i < seminars.size(); i++){
+            System.out.print(seminars.get(i).getSessionID() + "   ");
         }
     }
 

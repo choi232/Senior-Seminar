@@ -7,17 +7,18 @@ public class Seminar {
     int numEnrolled = 0;
     Student[] students = new Student[16];
     int studentsIndex = 0;
-    boolean duplicate = false;
+    //SessionID of other duplicate session
+    int duplicate = -1;
 
     public Seminar(String setSessionName, int setSessionID, String setPresenterName){
         sessionName = setSessionName;
         sessionID = setSessionID;
         presenterName = setPresenterName;
     }
-    public void setDuplicate(boolean val){
+    public void setDuplicate(int val){
         duplicate = val;
     }
-    public boolean getDuplicate(){
+    public int getDuplicate(){
         return duplicate;
     }
 

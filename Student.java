@@ -49,7 +49,7 @@ public class Student{
     public int getChoice(int index){
         return choice.get(index);
     }
-    public int getChoiceSize(int index){
+    public int getChoiceSize(){
         return choice.size();
     }
 
