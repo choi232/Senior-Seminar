@@ -20,7 +20,12 @@ public class Seminar {
         sessionID = setSessionID;
         presenterName = setPresenterName;
     }
-
+    public void resetStudents(){
+        studentsIndex = 0;
+        for(int i = 0; i < 16; i++){
+            students[i] = null;
+        }
+    }
     public void setRandom(){
         random = (int)(Math.random()*100);
     }

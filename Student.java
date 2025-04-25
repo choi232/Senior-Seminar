@@ -31,7 +31,13 @@ public class Student{
     public void addSeminar(Seminar setSeminar){
         seminars[seminarsIndex] = setSeminar;
         seminarsIndex++;
+    }
 
+    public void resetSeminars(){
+        for(int i = 0; i < 5; i++){
+            seminars[i] = null;
+        }
+        seminarsIndex = 0;
     }
 
     public void setPlacability(int setPlacability){

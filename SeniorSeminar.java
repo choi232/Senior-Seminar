@@ -3,6 +3,10 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import java.io.FileWriter;   // Import the FileWriter class
+import java.io.IOException;  // Import the IOException class to handle errors
+import javax.sound.midi.SysexMessage;
+
 public class SeniorSeminar {
 
     ArrayList<Student> students = new ArrayList<Student>();
@@ -12,19 +16,11 @@ public class SeniorSeminar {
     ArrayList<Seminar> sortedSeminars = seminars;
     Seminar[][] test;
 
-
-    public void optimizeSchedule(){
-        double value = 4.5;
-        //ArrayList of top 25 popular seminars (ArrayList accounts for max two sessions and min one session per professor rule)
-        ArrayList<Seminar> popularSeminars = new ArrayList<Seminar>();
+    public Seminar[][] createRandomSchedule(ArrayList<Seminar> popularSeminars){
         for(int i = 0, len = seminars.size(); i < len; i++){
-            //Check if seminars is to be cut and if not add into top 25 popular seminars
-            if(!seminars.get(i).getIsCut()){
-                seminars.get(i).setRandom();
-                popularSeminars.add(seminars.get(i));
-            }
+            seminars.get(i).setRandom();
         }
-        //Sort random numbers from lowest to highest to create a new random order to add to schedule
+        //Sort random numbers from lowest to highest to create a new random order to add to schedule in this new pseudorandom sorted order
         sortSeminarsByRandom(popularSeminars);
 
         Seminar[][] randomSchedule = new Seminar[5][5];
@@ -34,13 +30,63 @@ public class SeniorSeminar {
                 seminarIndex++;
             }
         }
-        while(true){
-            if()
+
+        return randomSchedule;
+    }
+    public void resetData(){
+        for(int studentID = 0, len = students.size(); studentID < len; studentID++){
+            students.get(studentID).resetSeminars();
+            
         }
+        for(int seminarIndex = 0, len = seminars.size(); seminarIndex < len; seminarIndex++){
+            seminars.get(seminarIndex).resetStudents();
+            seminars.get(seminarIndex).setIsFull(false);
+        }
+    }
+    public void optimizeSchedule(){
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Please input optimization value: ");
+        double optimizationValue = scan.nextDouble();
+        //Seems like the max value that I can get from my placing algorithm without the computer taking forever
+        //double optimizationValue = 4.2;
+        //ArrayList of top 25 popular seminars (ArrayList accounts for max two sessions and min one session per professor rule)
+        ArrayList<Seminar> popularSeminars = new ArrayList<Seminar>();
+        for(int i = 0, len = seminars.size(); i < len; i++){
+            //Check if seminars is to be cut and if not add into top 25 popular seminars
+            if(!seminars.get(i).getIsCut()){
+                popularSeminars.add(seminars.get(i));
+            }
+        }
+        Seminar[][] randomSchedule;
+        while(true){
+            randomSchedule = createRandomSchedule(popularSeminars);
+            if(placeStudents(randomSchedule) < optimizationValue){
+                resetData();
+            }
+            else break;
+        }
+
+        try {
+            //File title is optimization value + Schedules.csv so that data can be saved for any optimization value
+            FileWriter myWriter = new FileWriter("Saved Schedules/" + optimizationValue + "Schedules.csv");
+            for(int row = 0; row < 5; row++){
+                for(int col = 0; col < 5; col++){
+                    if(col != 4) myWriter.write(randomSchedule[row][col].getSessionID() + ",");
+                    else myWriter.write(randomSchedule[row][col].getSessionID()+"\n");
+                }
+            }
+            myWriter.write("\n");
+            myWriter.close();
+            System.out.println("\nSchedule saved to " + optimizationValue + "Schedules.csv");
+          } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+          }
     }
 
     public void runSeniorSeminar(){
         loadCSV();
+        sortStudentsByPlacability();
         optimizeSchedule();
     }
 
@@ -82,9 +128,11 @@ public class SeniorSeminar {
             sortedStudents.set(i, sortedStudents.get(currMinIndex));
             sortedStudents.set(currMinIndex, temp);
         }
+        /*
         for(int i = 0, len = sortedStudents.size(); i < len; i++){
             System.out.print(sortedStudents.get(i).getPlacability() + "   ");
         }
+            */
     }
 
     public void sortSeminarsByRandom(ArrayList<Seminar> arrayList){
@@ -149,7 +197,7 @@ public class SeniorSeminar {
         // {seminars.get(5-1), seminars.get(11-1), seminars.get(16-1), seminars.get(22-1), seminars.get(27-1)}
         // };  
         int totalMatchedSeminars = 0;
-        sortStudentsByPlacability();
+
 
         //iterates through every student
         for(int studentID = 0; studentID < sortedStudents.size(); studentID++){
@@ -199,17 +247,18 @@ public class SeniorSeminar {
             }
         }   
     
-        //Calculate avgCoursePlacement
-        for(int studentID = 0; studentID < sortedStudents.size(); studentID++){
-            Student currStudent = sortedStudents.get(studentID);
-            System.out.println("");
-            for(int i = 0; i < currStudent.getSeminarsIndex(); i++){
-                System.out.print(currStudent.getSeminar(i).getSessionID() + "   ");
-            }
-            //System.out.print("***" + currStudent.getStudentID());
-            System.out.println();
-        }   
+        // //Calculate avgCoursePlacement
+        // for(int studentID = 0; studentID < sortedStudents.size(); studentID++){
+        //     Student currStudent = sortedStudents.get(studentID);
+        //     System.out.println("");
+        //     for(int i = 0; i < currStudent.getSeminarsIndex(); i++){
+        //         System.out.print(currStudent.getSeminar(i).getSessionID() + "   ");
+        //     }
+        //     //System.out.print("***" + currStudent.getStudentID());
+        //     System.out.println();
+        // }   
         double avgCoursePlacement = totalMatchedSeminars/70.0;
+        System.out.println(totalMatchedSeminars);
         System.out.print(avgCoursePlacement);
         
         return avgCoursePlacement;
@@ -218,8 +267,9 @@ public class SeniorSeminar {
     public void printStudentSchedule(int studentID){
         Student student = students.get(studentID-1);
         for(int i = 0; i < 5; i++){
-            System.out.println(student.getSeminar(i).getSessionID());
+            System.out.print(student.getSeminar(i).getSessionID() + "   ");
         }
+        System.out.println();
     }
 
     
@@ -296,7 +346,7 @@ public class SeniorSeminar {
                                 if(seminars.get(sessionID-1).getDuplicate() != -1){
                                     //Adds duplicate choice into choice ArrayList
                                     choice.add(seminars.get(sessionID-1).getDuplicate());
-                                    seminars.get(seminars.get(sessionID-1).getDuplicate()-1).incrementNumEnrolled(1);;
+                                    seminars.get(seminars.get(sessionID-1).getDuplicate()-1).incrementNumEnrolled(1);
                                 }
                                 //Increment number of students enrolled into seminars attribute
                                 seminars.get(sessionID-1).incrementNumEnrolled(1);
@@ -328,11 +378,11 @@ public class SeniorSeminar {
             }
             System.out.println("");
         }
-        */
+        
         for(int i = 0; i < seminars.size(); i++){
             System.out.print(seminars.get(i).getNumEnrolled() + "   ");
         }
-        
+        */
     }
 
 
