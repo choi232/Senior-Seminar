@@ -20,16 +20,14 @@ public class SeniorSeminar {
 
     public void runSeniorSeminar(){
         loadCSV();
-        //sortTally();
-        sortStudentsByPlacability();
         placeStudents();
     }
 
-    public void calculateStudentPlacability(){
+    public void calculatePlacability(){
         //Placability it the total spots available in the seminar minus the students who want these spots
         //Calculate placability of each seminar
         for(int sessionIndex = 0; sessionIndex < seminars.size(); sessionIndex++){
-            
+            seminars.get(sessionIndex).setPlacability(16-seminars.get(sessionIndex).getNumEnrolled());
         }
         //Calculate placability of each student
         for(int studentID = 0; studentID < students.size(); studentID++){
@@ -44,7 +42,7 @@ public class SeniorSeminar {
         
     }
     public void sortStudentsByPlacability(){
-        calculateStudentPlacability();
+        calculatePlacability();
 
         //Sort each student by placability with selection sort from lowest to highest
 
@@ -66,23 +64,27 @@ public class SeniorSeminar {
         for(int i = 0, len = sortedStudents.size(); i < len; i++){
             System.out.print(sortedStudents.get(i).getPlacability() + "   ");
         }
+    }
+
+    public ArrayList<Seminar> sortSeminarsByPlacability(ArrayList<Seminar> arrayList){
         //Sort each seminar by placability with selection sort from lowest to highest
 
-        for(int i = 0, len = sortedSeminars.size(); i < len; i++){
+        for(int i = 0, len = arrayList.size(); i < len; i++){
             int currMinIndex = i;
-            int currMinimum = sortedStudents.get(i).getPlacability();
+            int currMinimum = arrayList.get(i).getPlacability();
 
-            for(int j = i; j < sortedSeminars.size(); j++){
-                Seminar currSeminar = sortedSeminars.get(j);
+            for(int j = i; j < arrayList.size(); j++){
+                Seminar currSeminar = arrayList.get(j);
                 if(currSeminar.getPlacability() < currMinimum){
                     currMinimum = currSeminar.getPlacability();
                     currMinIndex = j;
                 }
             }
-            Seminar temp = sortedSeminars.get(i);
-            sortedSeminars.set(i, sortedSeminars.get(currMinIndex));
-            sortedSeminars.set(currMinIndex, temp);
+            Seminar temp = arrayList.get(i);
+            arrayList.set(i, arrayList.get(currMinIndex));
+            arrayList.set(currMinIndex, temp);
         }
+        return arrayList;
     }
     public boolean isPlaced(Student student, int sessionID){
         //Iterate through placed seminars from student schedule and see if they have a match with the passed argument sessionID
@@ -105,9 +107,10 @@ public class SeniorSeminar {
         {seminars.get(2-1), seminars.get(7-1), seminars.get(13-1), seminars.get(19-1), seminars.get(24-1)},
         {seminars.get(3-1), seminars.get(9-1), seminars.get(14-1), seminars.get(20-1), seminars.get(25-1)},
         {seminars.get(4-1), seminars.get(10-1), seminars.get(15-1), seminars.get(21-1), seminars.get(26-1)},
-        {seminars.get(5-1), seminars.get(11-1), seminars.get(6-1), seminars.get(22-1), seminars.get(27-1)}
+        {seminars.get(5-1), seminars.get(11-1), seminars.get(16-1), seminars.get(22-1), seminars.get(27-1)}
         };  
 
+        sortStudentsByPlacability();
 
         //iterates through every student
         for(int studentID = 0; studentID < sortedStudents.size(); studentID++){
@@ -125,31 +128,72 @@ public class SeniorSeminar {
                         if(currChoice == currSeminar.getSessionID() && !isPlaced(currStudent, currChoice) && !currSeminar.getIsFull()){
                             currStudent.addSeminar(currSeminar);
                             currSeminar.addStudent(currStudent);
+                            isFilled = true;
                             break outer;
                         }
                         
-                        
                     }   
                 }
+                // if(row == 0 && studentID == 40){
+                //     for(int i = 0; i < 5; i++){
+                //         System.out.println(timeslotSeminars.get(i).getStudentsIndex());
+                //     }
+                // }
+                //If student cannot be placed out of choices then place them into least popular course available in given timeslot
                 if(!isFilled){
-                    //seminarIndex++;
+                    ArrayList<Seminar> timeslotSeminars = new ArrayList<Seminar>();
+                    if(studentID == 72)System.out.println();
+                    for(int col = 0, timeslotIndex = 0; col < 5; col++, timeslotIndex++){
+                        timeslotSeminars.add(schedule[row][col]);
+                    }
+                    if(studentID == 72) System.out.println();
+                    timeslotSeminars = sortSeminarsByPlacability(timeslotSeminars);
+                    for(int col = 0; col < 5; col++){
+                        if(studentID == 72) System.out.println(timeslotSeminars.get(col).getStudentsIndex());
+                    }
+                    for(int timeslotIndex = 4; timeslotIndex >= 0; timeslotIndex--){
+                        Seminar currSeminar = timeslotSeminars.get(timeslotIndex);
+                        if(!currSeminar.getIsFull()){
+                            currStudent.addSeminar(currSeminar);
+                            currSeminar.addStudent(currStudent);
+                            break;
+                        }
+                        if(timeslotIndex == 0){
+                            // for(int i = 0; i < 5; i++){
+                            //     System.out.println(timeslotSeminars.get(i).getStudentsIndex());
+                            // }
+                        }
+                    }
                 }
             }
-        }
+        }   
+    
 
         //Calculate avgCoursePlacement
         int totalMatchedSeminars = 0;
-        int totalStudents = 0;
         for(int studentID = 0; studentID < sortedStudents.size(); studentID++){
             Student currStudent = sortedStudents.get(studentID);
+            System.out.println("");
             for(int i = 0; i < currStudent.getSeminarsIndex(); i++){
                 System.out.print(currStudent.getSeminar(i).getSessionID() + "   ");
             }
+            //System.out.print("***" + currStudent.getStudentID());
             System.out.println();
-        }
+        }   
+        double avgCoursePlacement = totalMatchedSeminars/74.0;
+        System.out.println(seminars.get(5).getDuplicate());
+        System.out.println(totalMatchedSeminars);
+        System.out.print(avgCoursePlacement);
+        
         return 0.1;
     }
 
+    public void printStudentSchedule(int studentID){
+        Student student = students.get(studentID-1);
+        for(int i = 0; i < 5; i++){
+            System.out.println(student.getSeminar(i).getSessionID());
+        }
+    }
     public void sortTally(){
         //Initialize tally with sessionID values
         for(int i = 0; i < 18; i++){
@@ -315,8 +359,5 @@ public class SeniorSeminar {
 
     }
 
-    public void printStudentSchedule(){
-
-    }
 
 }
