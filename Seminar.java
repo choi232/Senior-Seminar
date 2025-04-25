@@ -13,11 +13,21 @@ public class Seminar {
     boolean isCut = false;
     boolean isFull = false;
 
+    int random;
+
     public Seminar(String setSessionName, int setSessionID, String setPresenterName){
         sessionName = setSessionName;
         sessionID = setSessionID;
         presenterName = setPresenterName;
     }
+
+    public void setRandom(){
+        random = (int)(Math.random()*100);
+    }
+    public int getRandom(){
+        return random;
+    }
+
     public void setIsFull(boolean val){
         isFull = val;
     }

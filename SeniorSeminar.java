@@ -12,15 +12,36 @@ public class SeniorSeminar {
     ArrayList<Seminar> sortedSeminars = seminars;
     Seminar[][] test;
 
-    int[][] tally = new int[18][3];
 
-    public SeniorSeminar(){
+    public void optimizeSchedule(){
+        double value = 4.5;
+        //ArrayList of top 25 popular seminars (ArrayList accounts for max two sessions and min one session per professor rule)
+        ArrayList<Seminar> popularSeminars = new ArrayList<Seminar>();
+        for(int i = 0, len = seminars.size(); i < len; i++){
+            //Check if seminars is to be cut and if not add into top 25 popular seminars
+            if(!seminars.get(i).getIsCut()){
+                seminars.get(i).setRandom();
+                popularSeminars.add(seminars.get(i));
+            }
+        }
+        //Sort random numbers from lowest to highest to create a new random order to add to schedule
+        sortSeminarsByRandom(popularSeminars);
 
+        Seminar[][] randomSchedule = new Seminar[5][5];
+        for(int row = 0, seminarIndex = 0; row < 5; row++){
+            for(int col = 0; col < 5; col++){
+                randomSchedule[row][col] = popularSeminars.get(seminarIndex);
+                seminarIndex++;
+            }
+        }
+        while(true){
+            if()
+        }
     }
 
     public void runSeniorSeminar(){
         loadCSV();
-        placeStudents();
+        optimizeSchedule();
     }
 
     public void calculatePlacability(){
@@ -66,7 +87,26 @@ public class SeniorSeminar {
         }
     }
 
-    public ArrayList<Seminar> sortSeminarsByPlacability(ArrayList<Seminar> arrayList){
+    public void sortSeminarsByRandom(ArrayList<Seminar> arrayList){
+        //Sort each seminar by placability with selection sort from lowest to highest
+
+        for(int i = 0, len = arrayList.size(); i < len; i++){
+            int currMinIndex = i;
+            int currMinimum = arrayList.get(i).getRandom();
+
+            for(int j = i; j < arrayList.size(); j++){
+                Seminar currSeminar = arrayList.get(j);
+                if(currSeminar.getRandom() < currMinimum){
+                    currMinimum = currSeminar.getRandom();
+                    currMinIndex = j;
+                }
+            }
+            Seminar temp = arrayList.get(i);
+            arrayList.set(i, arrayList.get(currMinIndex));
+            arrayList.set(currMinIndex, temp);
+        }    }
+
+    public void sortSeminarsByPlacability(ArrayList<Seminar> arrayList){
         //Sort each seminar by placability with selection sort from lowest to highest
 
         for(int i = 0, len = arrayList.size(); i < len; i++){
@@ -84,7 +124,6 @@ public class SeniorSeminar {
             arrayList.set(i, arrayList.get(currMinIndex));
             arrayList.set(currMinIndex, temp);
         }
-        return arrayList;
     }
     public boolean isPlaced(Student student, int sessionID){
         //Iterate through placed seminars from student schedule and see if they have a match with the passed argument sessionID
@@ -101,14 +140,14 @@ public class SeniorSeminar {
         }
         return false;
     }
-    public double placeStudents(){
-        Seminar[][] schedule = 
-        {{seminars.get(1-1), seminars.get(6-1), seminars.get(12-1), seminars.get(18-1), seminars.get(23-1)},
-        {seminars.get(2-1), seminars.get(7-1), seminars.get(13-1), seminars.get(19-1), seminars.get(24-1)},
-        {seminars.get(3-1), seminars.get(9-1), seminars.get(14-1), seminars.get(20-1), seminars.get(25-1)},
-        {seminars.get(4-1), seminars.get(10-1), seminars.get(15-1), seminars.get(21-1), seminars.get(26-1)},
-        {seminars.get(5-1), seminars.get(11-1), seminars.get(16-1), seminars.get(22-1), seminars.get(27-1)}
-        };  
+    public double placeStudents(Seminar[][] schedule){
+        // Seminar[][] schedule = 
+        // {{seminars.get(1-1), seminars.get(6-1), seminars.get(12-1), seminars.get(18-1), seminars.get(23-1)},
+        // {seminars.get(2-1), seminars.get(7-1), seminars.get(13-1), seminars.get(19-1), seminars.get(24-1)},
+        // {seminars.get(3-1), seminars.get(9-1), seminars.get(14-1), seminars.get(20-1), seminars.get(25-1)},
+        // {seminars.get(4-1), seminars.get(10-1), seminars.get(15-1), seminars.get(21-1), seminars.get(26-1)},
+        // {seminars.get(5-1), seminars.get(11-1), seminars.get(16-1), seminars.get(22-1), seminars.get(27-1)}
+        // };  
         int totalMatchedSeminars = 0;
         sortStudentsByPlacability();
 
@@ -145,7 +184,7 @@ public class SeniorSeminar {
                     for(int col = 0; col < 5; col++){
                         timeslotSeminars.add(schedule[row][col]);
                     }
-                    timeslotSeminars = sortSeminarsByPlacability(timeslotSeminars);
+                    sortSeminarsByPlacability(timeslotSeminars);
 
                     //Iterate backwards through sorted array to pick least popular session
                     for(int timeslotIndex = 4; timeslotIndex >= 0; timeslotIndex--){
