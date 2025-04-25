@@ -9,11 +9,26 @@ public class Seminar {
     int studentsIndex = 0;
     //SessionID of other duplicate session
     int duplicate = -1;
+    //Boolean flag to tell if the class has been cut or not
+    boolean isCut = false;
+    boolean isFull = false;
 
     public Seminar(String setSessionName, int setSessionID, String setPresenterName){
         sessionName = setSessionName;
         sessionID = setSessionID;
         presenterName = setPresenterName;
+    }
+    public void setIsFull(boolean val){
+        isFull = val;
+    }
+    public boolean getIsFull(){
+        return isFull;
+    }
+    public void setIsCut(boolean val){
+        isCut = val;
+    }
+    public boolean getIsCut(){
+        return isCut;
     }
     public void setDuplicate(int val){
         duplicate = val;
@@ -24,6 +39,18 @@ public class Seminar {
 
     public int getStudentsIndex(){
         return studentsIndex;
+    }
+    public void incrementStudentsIndex(){
+        studentsIndex++;
+    }
+
+    public Student getStudent(int index){
+        return students[index];
+    }
+
+    public void addStudent(Student student){
+        students[studentsIndex] = student;
+        studentsIndex++;
     }
 
     public void incrementNumEnrolled(int step){
