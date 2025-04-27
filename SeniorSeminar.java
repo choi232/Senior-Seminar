@@ -1,10 +1,20 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.io.File;                    //Import File to create file objects of CSVs
+import java.io.FileNotFoundException;   //Import FileNotFoundException to catch FileNotFoundException errors
+import java.util.ArrayList;             //Import ArrayList 
+import java.util.Scanner;               //Import Scanner to read user input
+import java.io.FileWriter;              // Import FileWriter
+import java.io.IOException;             // Import IOException to catch IOException errors
 
-import java.io.FileWriter;   // Import the FileWriter class
-import java.io.IOException;  // Import the IOException class to handle errors
+/** 
+ * SeniorSeminar.java File for creating SeniorSeminar object which contains all the methods to run SeniorSeminar from Main.java
+ * @author Mikael Choi 
+ * @since 4/26/2025
+ * Preconditions: CSV file data to run loadCSV() method
+ * Postconditions: Creates Student and Seminar objects as well as creates a SeniorSeminar object which can run the entire optimization program
+ * Purpose: to load student and seminar objects from CSV and then create a random schedule 
+ * to place students into seminar objects until desired optimization value is reached and then
+ * saving the schedule into a corresponding schedule CSV file
+ * **/
 
 public class SeniorSeminar {
 
@@ -46,7 +56,7 @@ public class SeniorSeminar {
         Scanner scan = new Scanner(System.in);
         System.out.println("Please input optimization value: ");
         double optimizationValue = scan.nextDouble();
-        //Seems like the max value that I can get from my placing algorithm without the computer taking forever
+        //Seems like the max value that I can get from my placing algorithm without the computer taking forever is 4.2
         //double optimizationValue = 4.2;
         //ArrayList of top 25 popular seminars (ArrayList accounts for max two sessions and min one session per professor rule)
         ArrayList<Seminar> popularSeminars = new ArrayList<Seminar>();

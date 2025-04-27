@@ -11,8 +11,8 @@
 import java.util.ArrayList; //Import ArrayList
 
 /* 
- * 
- * 
+ * Student class creates a blueprint of Student object with all attributes to describe Student object
+ * and methods required to get and set attributes as SeniorSeminar class requires
 */
 
 public class Student{
