@@ -5,6 +5,7 @@ import java.util.Scanner; //Import Scanner Class
 
 /*
  * Test class just meant to test out some code like the in class portions of printing out a 2d ArrayList and tallying
+ * THIS CLASS IS NEVER ACTUALLY IMPLEMENTED WITHIN SENIORSEMINAR, it was purely used to just test out code before (basically my first iteration of loadCSV)
  */
 public class Test{
     public static void main(String[] args){

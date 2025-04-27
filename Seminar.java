@@ -40,6 +40,7 @@ public class Seminar {
     //Boolean flag to tell if the class is full or not
     private boolean isFull = false;
 
+    //Random number assigned to each Seminar to create a random order to place by
     private int random;
 
     //Constructor to create seminar object with sessionName, sessionID, and presenterName
@@ -52,7 +53,9 @@ public class Seminar {
     //Getter and Setter Methods for Seminar Objects
 
     /*
-     * Setter method which resets all attributes changed from placeStudents() function
+     * Setter method which resets all attributes changed from placeStudents() function, specifically studentsIndex and students array
+     * Requires: none
+     * Returns: void
      */
     public void resetStudents(){
         studentsIndex = 0;
@@ -63,6 +66,8 @@ public class Seminar {
 
     /*
      * Setter method which sets random attribute (used to create a random order of seminar objects) to a random number from 0-99
+     * Requires: none
+     * Returns: void
      */
     public void setRandom(){
         random = (int)(Math.random()*100);
@@ -70,6 +75,8 @@ public class Seminar {
 
     /*
      * Getter method which gets random attribute from Seminar object
+     * Requires: none
+     * Returns int random attribute
      */
     public int getRandom(){
         return random;
@@ -77,6 +84,8 @@ public class Seminar {
 
     /*
      * Setter method which sets boolean flag isFull to inputted value, helps track if a Seminar's students array is full or not
+     * Requires: boolean val
+     * Returns: none
      */
     public void setIsFull(boolean val){
         isFull = val;
@@ -84,6 +93,8 @@ public class Seminar {
 
     /*
      * Getter method which gets boolean flag isFull to identify if a Seminar's students array is full or not
+     * Requires: none
+     * Returns: boolean isFull
      */
     public boolean getIsFull(){
         return isFull;
@@ -91,24 +102,35 @@ public class Seminar {
 
     /*
      * Setter method which sets boolean flag isCut to inputted value, helps keep track if a Seminar object is going to be used in the schedule or not
+     * Requires: boolean val
+     * Returns: void
      */
     public void setIsCut(boolean val){
         isCut = val;
     }
+
     /*
      * Getter method which gets boolean flag isCut to identify if a Seminar object is going to be used in the schedule or not
+     * Requires: none
+     * Returns boolean isCut
      */
     public boolean getIsCut(){
         return isCut;
     }
+
     /*
      * Setter method which sets duplicate attribute (the sessionID of other duplicate if exists) to value
+     * Requires: int val
+     * Returns: void
      */
     public void setDuplicate(int val){
         duplicate = val;
     }
+
     /*
      * Getter method which gets duplicate attribute
+     * Requires: none
+     * Returns: int duplicate
      */
     public int getDuplicate(){
         return duplicate;
@@ -116,6 +138,8 @@ public class Seminar {
 
     /*
      * Getter method which gets studentsIndex to keep track of current position in students array
+     * Requires: none
+     * Returns: int studentsIndex
      */
     public int getStudentsIndex(){
         return studentsIndex;
@@ -124,13 +148,17 @@ public class Seminar {
 
     /*
      * Getter method which gets Student object in students array
+     * Requires: int index 
+     * Returns: Student object from students array at int index
      */
     public Student getStudent(int index){
         return students[index];
     }
 
     /*
-     * Setter method which adds Student object in students array and also increments studentIndex to update current position of students in array
+     * Setter method which adds Student object in students array and also increments studentIndex by 1 to update current position of students in array
+     * Requires: Student object
+     * Returns: void
      */
     public void addStudent(Student student){
         students[studentsIndex] = student;
@@ -139,6 +167,8 @@ public class Seminar {
 
     /*
      * Setter method which increments/decrements numEnrolled by step value, used to update the amount of students interested in a seminar in loadCSV()
+     * Requires: int step
+     * Returns: void
      */
     public void incrementNumEnrolled(int step){
         numEnrolled += step;
@@ -146,6 +176,8 @@ public class Seminar {
 
     /*
      * Getter method which gets numEnrolled
+     * Requires: none
+     * Returns: int numEnrolled
      */
     public int getNumEnrolled(){
         return numEnrolled;
@@ -153,6 +185,8 @@ public class Seminar {
 
     /*
      * Setter method which sets placability (an value meant to represent student interest in a Seminar which is caclulated by the difference between spots available minus numEnrolled) to inputted value
+     * Requires: int setPlacability
+     * Returns: void;
      */
     public void setPlacability(int setPlacability){
         placability = setPlacability;
@@ -160,6 +194,8 @@ public class Seminar {
 
     /*
     * Setter method to just increment/decrement placability by step value
+    * Requires: int step
+    * Returns: void
     */
     public void incrementPlacability(int step){
         placability += step;
@@ -167,6 +203,8 @@ public class Seminar {
 
     /*
      * Getter method which gets placability
+     * Requires: none
+     * Returns: int placability
      */
     public int getPlacability(){
         return placability;
@@ -174,6 +212,8 @@ public class Seminar {
 
     /*
      * Getter method which gets sessionName
+     * Requires: none
+     * Returns: String sessionName
      */
     public String getSessionName(){
         return sessionName;
@@ -181,6 +221,8 @@ public class Seminar {
 
     /*
      * Getter method which gets sessionID
+     * Requires: none
+     * Returns:int sessionID
      */
     public int getSessionID(){
         return sessionID;
@@ -188,6 +230,8 @@ public class Seminar {
 
     /*
      * Getter method which gets presenterName
+     * Requires: none
+     * Returns: String presenterName
      */
     public String getPresenterName(){
         return presenterName;
