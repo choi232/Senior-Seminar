@@ -1,20 +1,30 @@
+/** 
+ * Seminar.java File for creating Seminar objects in Senior Seminar
+ * @author Mikael Choi 
+ * @since 4/26/2025
+ * Preconditions: CSV file data to create Seminar objects
+ * Postconditions: Creates a seminar object with getter and setter methods as well as important attributes
+ * Purpose: Create a blueprint of attributes and methods for the 
+ * seminar object to better store data about seminars
+ * **/
 public class Seminar {
-    String sessionName;
-    int sessionID;
-    String presenterName;
+    private String sessionName;
+    private int sessionID;
+    private String presenterName;
 
-    int placability = 16;
-    int numEnrolled = 0;
-    Student[] students = new Student[16];
-    int studentsIndex = 0;
+    private int placability = 16;
+    private int numEnrolled = 0;
+    private Student[] students = new Student[16];
+    private int studentsIndex = 0;
     //SessionID of other duplicate session
-    int duplicate = -1;
+    private int duplicate = -1;
     //Boolean flag to tell if the class has been cut or not
-    boolean isCut = false;
-    boolean isFull = false;
+    private boolean isCut = false;
+    private boolean isFull = false;
 
-    int random;
+    private int random;
 
+    //Constructor to create seminar object with sessionName, sessionID, and presenterName
     public Seminar(String setSessionName, int setSessionID, String setPresenterName){
         sessionName = setSessionName;
         sessionID = setSessionID;

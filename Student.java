@@ -1,4 +1,19 @@
-import java.util.ArrayList;
+/** 
+ * Student.java File for creating Student objects in Senior Seminar
+ * @author Mikael Choi 
+ * @since 4/26/2025
+ * Preconditions: CSV file data to create Student objects
+ * Postconditions: Creates student object with getter and setter methods as well as important attributes
+ * Purpose: Create a blueprint of attributes and methods for the 
+ * student object to better store data about students
+ * **/
+
+import java.util.ArrayList; //Import ArrayList
+
+/* 
+ * 
+ * 
+*/
 
 public class Student{
 
@@ -6,10 +21,10 @@ public class Student{
     private String email;
     private String time;
     private int studentID;
+    private int placability = 0;
     private ArrayList<Integer> choice;
     private Seminar[] seminars = new Seminar[5];
     private int seminarsIndex = 0;
-    private int placability = 0;
 
     public Student(String setName, String setEmail, String setTime, int setStudentID, ArrayList<Integer> setChoice){
         name = setName;

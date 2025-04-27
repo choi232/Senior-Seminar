@@ -5,7 +5,6 @@ import java.util.Scanner;
 
 import java.io.FileWriter;   // Import the FileWriter class
 import java.io.IOException;  // Import the IOException class to handle errors
-import javax.sound.midi.SysexMessage;
 
 public class SeniorSeminar {
 
@@ -14,7 +13,7 @@ public class SeniorSeminar {
 
     ArrayList<Student> sortedStudents = students;
     ArrayList<Seminar> sortedSeminars = seminars;
-    Seminar[][] test;
+
 
     public Seminar[][] createRandomSchedule(ArrayList<Seminar> popularSeminars){
         for(int i = 0, len = seminars.size(); i < len; i++){
@@ -68,14 +67,15 @@ public class SeniorSeminar {
 
         try {
             //File title is optimization value + Schedules.csv so that data can be saved for any optimization value
-            FileWriter myWriter = new FileWriter("Saved Schedules/" + optimizationValue + "Schedules.csv");
+            //Second argument true creates FileWriter as an appending FileWriter object so data can be saved and not overwritten4.4
+            FileWriter myWriter = new FileWriter("Saved Schedules/" + optimizationValue + "Schedules.csv", true);
             for(int row = 0; row < 5; row++){
                 for(int col = 0; col < 5; col++){
-                    if(col != 4) myWriter.write(randomSchedule[row][col].getSessionID() + ",");
-                    else myWriter.write(randomSchedule[row][col].getSessionID()+"\n");
+                    if(col != 4) myWriter.append(randomSchedule[row][col].getSessionID() + ",");
+                    else myWriter.append(randomSchedule[row][col].getSessionID()+"\n");
                 }
             }
-            myWriter.write("\n");
+            myWriter.append("\n");
             myWriter.close();
             System.out.println("\nSchedule saved to " + optimizationValue + "Schedules.csv");
           } catch (IOException e) {
