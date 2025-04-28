@@ -33,7 +33,10 @@ public class SeniorSeminar {
         sortStudentsByPlacability();
         optimizeSchedule();
         sortByName();
+        //printMasterSchedule();
+        //printSessionRoster();
         printStudentSchedule();
+        
 
     }
     
@@ -335,9 +338,41 @@ public class SeniorSeminar {
     }
 
     public void optimizeSchedule(){
+        int stop;
         Scanner scan = new Scanner(System.in);
-        System.out.println("Please input optimization value: ");
-        double optimizationValue = scan.nextDouble();
+
+        System.out.println("Welcome to Senior Seminar! This program will optimize a schedule to minimize course conflicts between a student's requested courses and scheduled courses.");
+        System.out.println("This program relies on an optimization value which is the average requested courses a student receives out of five.");
+        System.out.println("The program seeks to maximize this value by running possible iterations of randomly generated schedules and then running a placing algorithm and calculating the average courses placed.");
+
+        System.out.println("\nTo begin creating a schedule, please enter an integer between one and one million iterations that you would like to run: ");
+        String input = scan.nextLine();
+        while(true){
+            try {
+                stop = Integer.parseInt(input);
+                if(stop < 1 || stop > 1000000) System.out.println("Please enter a valid integer input for how many iterations you would like to run from one to one million: ");
+                else break;
+                input = scan.nextLine();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid integer input for how many iterations you would like to run from one to one million: ");
+                input = scan.nextLine();
+            }
+        }
+        System.out.println("Please input an optimization value (the program will stop early if this value is reached): ");
+        double optimizationValue;
+        input = scan.nextLine();
+        while(true){
+            try {
+                optimizationValue = Double.parseDouble(input);
+                if(optimizationValue < 0 || optimizationValue > 5) System.out.println("Please enter a valid double input from 0 to 5: ");
+                else break;
+                input = scan.nextLine();
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid double input from 0 to 5: ");
+                input = scan.nextLine();
+            }
+        }
+
         //Seems like the max value that I can get from my placing algorithm without the computer taking forever is 4.2
         //double optimizationValue = 4.2;
         //ArrayList of top 25 popular seminars (ArrayList accounts for max two sessions and min one session per professor rule)
@@ -351,22 +386,43 @@ public class SeniorSeminar {
             }
         }
         Seminar[][] randomSchedule;
+
+        int counter = 0;
         while(true){
             randomSchedule = createRandomSchedule(popularSeminars);
-            if(placeStudents(randomSchedule) < optimizationValue){
-                resetData();
-            }
-            else{
+            double currOptimization = placeStudents(randomSchedule);
+            counter++;
+            if(counter == 1){
+                optimizedCourseAvg = currOptimization;
                 optimizedSchedule = randomSchedule;
-                optimizedCourseAvg = optimizationValue;
+            }
+
+            if(currOptimization > optimizedCourseAvg){
+                optimizedCourseAvg = currOptimization;
+                optimizedSchedule = randomSchedule;
+            }
+
+            if(currOptimization >= optimizationValue){
+                System.out.println("\nThe program has ran through " + counter + " times and generated a schedule of " + optimizedCourseAvg + " optimization value");
                 break;
             }
+            if(counter == stop){
+                System.out.println();
+                System.out.println("\nThe program has ran through " + counter + " times and generated a schedule of " + optimizedCourseAvg + " optimization value");
+                break;
+            }
+
+            resetData();
+
+
         }
 
         try {
             //File title is optimization value + Schedules.csv so that data can be saved for any optimization value
-            //Second argument true creates FileWriter as an appending FileWriter object so data can be saved and not overwritten4.4
-            FileWriter myWriter = new FileWriter("Saved Schedules/" + optimizationValue + "Schedules.csv", true);
+            //Second argument true creates FileWriter as an appending FileWriter object so data can be saved and not overwritten
+            
+            FileWriter myWriter;
+            myWriter = new FileWriter("Saved Schedules/" + ((int)(optimizedCourseAvg*10)/10.0) + "Schedules.csv", true);
             for(int row = 0; row < 5; row++){
                 for(int col = 0; col < 5; col++){
                     if(col != 4) myWriter.append(randomSchedule[row][col].getSessionID() + ",");
@@ -375,7 +431,7 @@ public class SeniorSeminar {
             }
             myWriter.append("\n");
             myWriter.close();
-            System.out.println("\nSchedule saved to " + optimizationValue + "Schedules.csv");
+            System.out.println("\nSchedule saved to " + ((int)(optimizedCourseAvg*10)/10.0) + "Schedules.csv");
           } catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -420,10 +476,10 @@ public class SeniorSeminar {
             sortedByNameSeminars.set(i, sortedByNameSeminars.get(currMinIndex));
             sortedByNameSeminars.set(currMinIndex, temp);
         }
-        System.out.println(sortedByNameSeminars.size());
-        for(int j = 0; j < sortedByNameSeminars.size(); j++){
-            System.out.println(sortedByNameSeminars.get(j).getSessionName());
-        }
+        // System.out.println(sortedByNameSeminars.size());
+        // for(int j = 0; j < sortedByNameSeminars.size(); j++){
+        //     System.out.println(sortedByNameSeminars.get(j).getSessionName());
+        // }
     }
 
     public ArrayList<String[]> sortSplitNames(ArrayList<String[]> splitNames){
@@ -498,8 +554,11 @@ public class SeniorSeminar {
                 String studentID = students.get(i).getStudentID() + "";
                 String[] splitStudentName = students.get(i).getName().split(" ");
                 for(int j = 0; j < splitStudentName.length; j++){
+                    String partialName = splitStudentName[j].toLowerCase();
+                    //Deletes the end parenthesis () around a nickname or pronounciation of a name within a partialName
+                    if(partialName.length()>0 && partialName.charAt(0) == '(') partialName = partialName.substring(1, partialName.length()-1);
                     //Stores each splitName into an array with both the splitName and which studentID the partial name comes from
-                    String[] nameID = {splitStudentName[j].toLowerCase(), studentID};
+                    String[] nameID = {partialName, studentID};
                     splitNames.add(nameID);
                 }
             }
@@ -640,57 +699,65 @@ public class SeniorSeminar {
 
     public void printStudentSchedule(){
         Scanner scan = new Scanner(System.in);
-        System.out.println("Would you like to search up a student's schedule?");
-        String input = scan.nextLine();
-        while(!input.equals("yes") && !input.equals("y") && !input.equals("no") && !input.equals("n")){
-            System.out.println("Please respond with either yes or no");
-            input = scan.nextLine();
-        }
+        while(true){
+            System.out.println();
+            System.out.println("Would you like to search up a student's schedule? (Please respond with either yes or no)");
+            String input = scan.nextLine();
+            while(!input.equals("yes") && !input.equals("y") && !input.equals("no") && !input.equals("n")){
+                System.out.println("Please respond with either yes or no");
+                input = scan.nextLine();
+            }
 
-        if(input.equals("yes") || input.equals("y")){
-            System.out.println("Would you like to search up a student by name (first and/or last name) or by student ID? Please enter \"name\" or \"id\": ");
-            input = scan.nextLine();
-            while(!input.equals("name") && !input.equals("id")){
-                System.out.println("Please respond with either \"name\" or \"id\"");
+            if(input.equals("yes") || input.equals("y")){
+                System.out.println("Would you like to search up a student by name (first and/or last name) or by student ID? Please enter \"name\" or \"id\": ");
                 input = scan.nextLine();
-            }
-            int id;
-            if(input.equals("name")){
-                System.out.println("Please enter the name you would like to search: ");
-                input = scan.nextLine();
-                id = binarySearchByName(input, 0);
-                while(id == -1){
-                    System.out.println("Match not found please enter a new name to search or press \"q\" to quit: ");
+                while(!input.equals("name") && !input.equals("id")){
+                    System.out.println("Please respond with either \"name\" or \"id\"");
                     input = scan.nextLine();
-                    if(input.equals("q")) return;
-                    id = binarySearchByName(input, 0);
                 }
-                id++;
-            }
-            else{
-                System.out.println("Please enter the student ID you would like to search: ");
-                input = scan.nextLine();
-                while(true){
-                    try {
-                        id = Integer.parseInt(input);
-                        if(id < 1 || id > 74) System.out.println("Please enter a valid integer input for student ID from 1-74");
-                        else break;
+                int id;
+                if(input.equals("name")){
+                    System.out.println("Please enter the name you would like to search: ");
+                    input = scan.nextLine();
+                    id = binarySearchByName(input, 0);
+                    while(id == -1){
+                        System.out.println("Match not found please enter a new name to search or press \"q\" to quit: ");
                         input = scan.nextLine();
-                    } catch (NumberFormatException e) {
-                        System.out.println("Please enter a valid integer input for student ID from 1-74");
+                        if(input.equals("q")) return;
+                        id = binarySearchByName(input, 0);
+                    }
+                    id++;
+                }
+                else{
+                    System.out.println("Please enter the student ID you would like to search: ");
+                    input = scan.nextLine();
+                    while(true){
+                        try {
+                            id = Integer.parseInt(input);
+                            if(id < 1 || id > 74) System.out.println("Please enter a valid integer input for student ID from 1-74");
+                            else break;
+                            input = scan.nextLine();
+                        } catch (NumberFormatException e) {
+                            System.out.println("Please enter a valid integer input for student ID from 1-74");
+                            input = scan.nextLine();
+                        }
                     }
                 }
-            }
 
-            Student student = students.get(id-1);
-            System.out.println("Student Name: " + student.getName());
-            System.out.println("Student Email: " + student.getEmail());
-            System.out.println();
-            for(int i = 0; i < 5; i++){
-                System.out.println("Block " + i + ": " + student.getSeminar(i).getSessionName() + " (" + student.getSeminar(i).getSessionID() + ")");
+                Student student = students.get(id-1);
+                System.out.println();
+                System.out.println("Student Name: " + student.getName());
+                System.out.println("Student Email: " + student.getEmail());
+                System.out.println();
+                for(int i = 0; i < 5; i++){
+                    System.out.println("Block " + (i+1) + ": " + student.getSeminar(i).getSessionName() + " (" + student.getSeminar(i).getSessionID() + ")");
+                }
+                
             }
-            System.out.println();
+            else break;
         }
+
+        
     }
 
     public void printMasterSchedule(){
