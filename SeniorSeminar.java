@@ -1,9 +1,9 @@
 import java.io.File;                    //Import File to create file objects of CSVs
 import java.io.FileNotFoundException;   //Import FileNotFoundException to catch FileNotFoundException errors
-import java.util.ArrayList;             //Import ArrayList 
-import java.util.Scanner;               //Import Scanner to read user input
-import java.io.FileWriter;              // Import FileWriter
-import java.io.IOException;             // Import IOException to catch IOException errors
+import java.io.FileWriter;             //Import ArrayList
+import java.io.IOException;               //Import Scanner to read user input
+import java.util.ArrayList;              // Import FileWriter
+import java.util.Scanner;             // Import IOException to catch IOException errors
 
 /** 
  * SeniorSeminar.java File for creating SeniorSeminar object which contains all the methods to run SeniorSeminar from Main.java
@@ -21,14 +21,17 @@ public class SeniorSeminar {
     ArrayList<Student> students = new ArrayList<Student>();
     ArrayList<Seminar> seminars = new ArrayList<Seminar>();
 
-    ArrayList<Student> sortedByPlacabilityStudents = students;
-    ArrayList<Student> sortedByNameStudents = students;
+    ArrayList<Student> sortedByPlacabilityStudents;
+    ArrayList<Student> sortedByNameStudents;
+    ArrayList<Seminar> sortedByNameSeminars = new ArrayList<Seminar>();
 
     public void runSeniorSeminar(){
         loadCSV();
         sortStudentsByPlacability();
-        sortStudentsByName();
-        optimizeSchedule();
+        //optimizeSchedule();
+        sortByName();
+        binarySearchByName("renee", 0);
+        binarySearchByName("the ", 1);
     }
     
     public void loadCSV(){
@@ -70,6 +73,13 @@ public class SeniorSeminar {
                     tempSeminar.setDuplicate(sessionID-18);
                     seminars.add(tempSeminar);
                     sessionID++;
+                }
+            }
+            
+            for(int i = 0, len = seminars.size(); i < len; i++){
+                //Check if seminars is to be cut and if not add into top 25 popular seminars
+                if(!seminars.get(i).getIsCut()){
+                    sortedByNameSeminars.add(seminars.get(i));
                 }
             }
             scan.close();
@@ -123,6 +133,12 @@ public class SeniorSeminar {
                 }
                 studentIndex++;
             }
+
+            //Copy over student ArrayList to sorted ArrayLists 
+            //Learned to do so from https://www.w3schools.com/java/ref_arraylist_clone.asp
+            sortedByPlacabilityStudents = (ArrayList) students.clone();
+            sortedByNameStudents = (ArrayList) students.clone();
+
             scan.close();
         } 
         catch (FileNotFoundException e) {
@@ -323,6 +339,8 @@ public class SeniorSeminar {
         //double optimizationValue = 4.2;
         //ArrayList of top 25 popular seminars (ArrayList accounts for max two sessions and min one session per professor rule)
         ArrayList<Seminar> popularSeminars = new ArrayList<Seminar>();
+
+
         for(int i = 0, len = seminars.size(); i < len; i++){
             //Check if seminars is to be cut and if not add into top 25 popular seminars
             if(!seminars.get(i).getIsCut()){
@@ -357,17 +375,18 @@ public class SeniorSeminar {
           }
     }
 
-    public void sortStudentsByName(){
+    public void sortByName(){
+        
         for(int i = 0, len = sortedByNameStudents.size(); i < len; i++){
             int currMinIndex = i;
-            String currMinimum = sortedByNameStudents.get(i).getName();
+            String currMinimum = sortedByNameStudents.get(i).getName().toLowerCase();
 
-            for(int j = i; j < sortedByPlacabilityStudents.size(); j++){
-                Student currStudent = sortedByPlacabilityStudents.get(j);
+            for(int j = i; j < sortedByNameStudents.size(); j++){
+                Student currStudent = sortedByNameStudents.get(j);
                 //Lexographically compare currentStudent's name with currMinimum name
-                if(currStudent.getName().compareTo(currMinimum) < 0){
+                if(currStudent.getName().toLowerCase().compareTo(currMinimum) < 0){
                     //If currStudent's name comes before currMinimum's name then swap the two
-                    currMinimum = currStudent.getName();
+                    currMinimum = currStudent.getName().toLowerCase();
                     currMinIndex = j;
                 }
             }
@@ -375,29 +394,50 @@ public class SeniorSeminar {
             sortedByNameStudents.set(i, sortedByNameStudents.get(currMinIndex));
             sortedByNameStudents.set(currMinIndex, temp);
         }
-    }
-
-    public ArrayList<String> sortSplitNames(ArrayList<String> splitNames){
-        for(int i = 0, len = splitNames.size(); i < len; i++){
+    
+    
+        for(int i = 0, len = sortedByNameSeminars.size(); i < len; i++){
             int currMinIndex = i;
-            String currMinimum = splitNames.get(i);
+            String currMinimum = sortedByNameSeminars.get(i).getSessionName().toLowerCase();
 
-            for(int j = i; j < splitNames.size(); j++){
-                String currName = splitNames.get(j);
+            for(int j = i; j < sortedByNameSeminars.size(); j++){
+                Seminar currSeminar = sortedByNameSeminars.get(j);
                 //Lexographically compare currentStudent's name with currMinimum name
-                if(currName.compareTo(currMinimum) < 0){
+                if(currSeminar.getSessionName().toLowerCase().compareTo(currMinimum) < 0){
                     //If currStudent's name comes before currMinimum's name then swap the two
-                    currMinimum = splitNames.get(j);
+                    currMinimum = currSeminar.getSessionName().toLowerCase();
                     currMinIndex = j;
                 }
             }
-            String temp = splitNames.get(i);
+            Seminar temp = sortedByNameSeminars.get(i);
+            sortedByNameSeminars.set(i, sortedByNameSeminars.get(currMinIndex));
+            sortedByNameSeminars.set(currMinIndex, temp);
+        }
+        System.out.println(sortedByNameSeminars.size());
+        for(int j = 0; j < sortedByNameSeminars.size(); j++){
+            System.out.println(sortedByNameSeminars.get(j).getSessionName());
+        }
+    }
+
+    public ArrayList<String[]> sortSplitNames(ArrayList<String[]> splitNames){
+        for(int i = 0, len = splitNames.size(); i < len; i++){
+            int currMinIndex = i;
+            String currMinimum = splitNames.get(i)[0].toLowerCase();
+
+            for(int j = i; j < splitNames.size(); j++){
+                String currName = splitNames.get(j)[0].toLowerCase();
+                //Lexographically compare currentStudent's name with currMinimum name
+                if(currName.compareTo(currMinimum) < 0){
+                    //If currStudent's name comes before currMinimum's name then swap the two
+                    currMinimum = splitNames.get(j)[0].toLowerCase();
+                    currMinIndex = j;
+                }
+            }
+            String[] temp = splitNames.get(i);
             splitNames.set(i, splitNames.get(currMinIndex));
             splitNames.set(currMinIndex, temp);
         }
-        for(int i = 0; i < splitNames.size(); i++){
-            System.out.println(splitNames.get(i));
-        }
+
         return splitNames;
     }
 
@@ -406,9 +446,11 @@ public class SeniorSeminar {
         //of the inputted name but the second time it will search for any matches of first, middle or last name
         Scanner scan = new Scanner(System.in);
 
-        String search = name;
+        String search = name.toLowerCase();
         int lowIndex = 0; //lower bound of possible values
-        int highIndex = sortedByNameStudents.size()-1; //upper bound of possible values
+        int highIndex;
+        if(type == 0) highIndex = sortedByNameStudents.size()-1; //upper bound of possible values
+        else highIndex = sortedByNameSeminars.size()-1;
         boolean isFound = false; //bool flag for if searching value is not in data set
         int middle, counter = 0;
         String guess;
@@ -418,7 +460,7 @@ public class SeniorSeminar {
             counter++;
             //Set middle to half of possible ArrayList plus current lower bound
             middle = lowIndex + (highIndex - lowIndex)/2; 
-            guess = sortedByNameStudents.get(middle).getName();
+            guess = sortedByNameStudents.get(middle).getName().toLowerCase();
 
             //check if guess is right
             if(guess.compareTo(search) == 0){
@@ -441,59 +483,143 @@ public class SeniorSeminar {
             }
         }
 
-        lowIndex = 0; //lower bound of possible values
-        highIndex = sortedByNameStudents.size()-1; //upper bound of possible values
-        counter = 0;
-        ArrayList<String> splitNames;
-        for(int i = 0, len = sortedByNameStudents.size(); i < len; i++){
-            String[] splitInputtedName = name.split(" ");
-            for(int j = 0; j < splitInputtedName.length; j++){
-                splitNames.add(splitInputtedName[j]);
-            }
-        }
-        if(!isFound){
-            for(int i = 0; i < splitInputtedName.length; i++){
-                search = splitInputtedName[i];
-                //Size of ArrayList is greater than zero
-                while(highIndex - lowIndex + 1 > 0){ 
-                    counter++;
-                    //Set middle to half of possible ArrayList plus current lower bound
-                    middle = lowIndex + (highIndex - lowIndex)/2; 
-                    String[] splitGuess = sortedByNameStudents.get(middle).getName().split(" ");
 
-                    for(int j = 0; j < splitGuess.length; j++){
-                        guess = splitGuess[j];
-                    
-                        //check if guess is right
-                        if(guess.compareTo(search) == 0){
-                            System.out.println("Did you mean " + guess + "? (Please respond with y/n)");
-                            String input = scan.nextLine();
-                            while(!input.equals("yes") || !input.equals("y") || !input.equals("no") || !input.equals("n")){
-                                System.out.println("Please respond with either yes or no");
-                            }
-                            if(input.equals("yes") || input.equals("y")){
-                                System.out.println("\n" + sortedByNameStudents.get(middle).getName());
-                                return sortedByNameStudents.get(middle).getStudentID();
-                            }
-                            
-                        }
+        ArrayList<String[]> splitNames = new ArrayList<String[]>();
 
-                        //guess too high then adjust upper bound
-                        else if(guess.compareTo(search) > 0){
-                            //If guess is too high then cut the list into half with highIndex at middle - 1
-                            highIndex = middle - 1;
-                            break;
-                        }
-
-                        //guess too low then adjust lower bound
-                        else if(guess.compareTo(search) < 0){
-                            //If guess is too low then cut the list into half with lowIndex at middle + 1
-                            lowIndex = middle + 1;
-                            break;
-                        }
-                    }
+        if(type == 0){
+            for(int i = 0, len = students.size(); i < len; i++){
+                String studentID = students.get(i).getStudentID() + "";
+                String[] splitStudentName = students.get(i).getName().split(" ");
+                for(int j = 0; j < splitStudentName.length; j++){
+                    //Stores each splitName into an array with both the splitName and which studentID the partial name comes from
+                    String[] nameID = {splitStudentName[j].toLowerCase(), studentID};
+                    splitNames.add(nameID);
                 }
             }
+        }
+
+        else{
+            for(int i = 0, len = seminars.size(); i < len; i++){
+                String studentID = seminars.get(i).getSessionID() + "";
+                String[] splitSeminarName = seminars.get(i).getSessionName().split(" ");
+                for(int j = 0; j < splitSeminarName.length; j++){
+                    //Stores each splitName into an array with both the splitName and which studentID the partial name comes from
+                    String[] nameID = {splitSeminarName[j].toLowerCase(), studentID};
+                    splitNames.add(nameID);
+                }
+            } 
+        }
+
+        splitNames = sortSplitNames(splitNames);
+
+        String[] splitInputtedName = name.split(" ");
+
+
+        for(int i = 0; i < splitInputtedName.length; i++){
+            lowIndex = 0; //lower bound of possible values
+            highIndex = splitNames.size()-1; //upper bound of possible values
+            counter = 0;
+            search = splitInputtedName[i].toLowerCase();
+            //Size of ArrayList is greater than zero
+            while(highIndex - lowIndex + 1 > 0){ 
+                counter++;
+                //Set middle to half of possible ArrayList plus current lower bound
+                middle = lowIndex + (highIndex - lowIndex)/2; 
+                guess = splitNames.get(middle)[0].toLowerCase();
+ 
+                //check if guess is right
+                if(guess.compareTo(search) == 0){
+                    int ID;
+                    if(type == 0) ID = Integer.parseInt(splitNames.get(middle)[1]);
+                    else ID = Integer.parseInt(splitNames.get(middle)[1]) - 1;
+                    String guessFullName;
+                    if(type == 0) guessFullName = students.get(ID).getName();
+                    else guessFullName = seminars.get(ID).getSessionName();
+                    if(type == 0) System.out.println("Did you mean " + guessFullName + "? (Please respond with y/n)");
+                    else System.out.println("Did you mean " + guessFullName + " (Session ID: " + seminars.get(ID).getSessionID() + ")" + "? (Please respond with y/n and note there are duplicates of this session)");
+                    String input = scan.nextLine();
+                    while(!input.equals("yes") && !input.equals("y") && !input.equals("no") && !input.equals("n")){
+                        System.out.println("Please respond with either yes or no");
+                        input = scan.nextLine();
+                    }
+                    if(input.equals("yes") || input.equals("y")){
+                        //System.out.println("\n" + guessFullName);
+                        return ID;
+                    }
+                    //if responds with no must search through all possible same partial names and ask
+                    else{
+                    
+                        int guessIndex = middle+1;
+                        if(guessIndex > 0 && guessIndex < splitNames.size()) guess = splitNames.get(guessIndex)[0].toLowerCase();
+                        //Check all possible same guesses by iterating forwards
+                        while(guess.equals(search) && guessIndex > 0 && guessIndex < splitNames.size()){
+                            if(type == 0) ID = Integer.parseInt(splitNames.get(guessIndex)[1]);
+                            else ID = Integer.parseInt(splitNames.get(guessIndex)[1]) - 1;
+
+                            if(type == 0) guessFullName = students.get(ID).getName();
+                            else guessFullName = seminars.get(ID).getSessionName();
+
+                            if(type == 0) System.out.println("Did you mean " + guessFullName + "? (Please respond with y/n)");
+                            else System.out.println("Did you mean " + guessFullName + " (Session ID: " + seminars.get(ID).getSessionID() + ")" + "? (Please respond with y/n and note there are duplicates of this session)");
+                            input = scan.nextLine();
+                            while(!input.equals("yes") && !input.equals("y") && !input.equals("no") && !input.equals("n")){
+                                System.out.println("Please respond with either yes or no");
+                                input = scan.nextLine();
+                            }
+                            if(input.equals("yes") || input.equals("y")){
+                                //System.out.println("\n" + guessFullName);
+                                return ID;
+                            }
+                            guessIndex++;
+                            guess = splitNames.get(guessIndex)[0];
+                        }
+
+                        //Check all possible same guesses by iterating backwards
+
+                        guessIndex = middle-1;
+                        if(guessIndex > 0 && guessIndex < splitNames.size()) guess = splitNames.get(guessIndex)[0];
+                        while(guess.equals(search) && guessIndex > 0 && guessIndex < splitNames.size()){
+                            if(type == 0) ID = Integer.parseInt(splitNames.get(guessIndex)[1]);
+                            else ID = Integer.parseInt(splitNames.get(guessIndex)[1]) - 1;
+
+                            if(type == 0) guessFullName = students.get(ID).getName();
+                            else guessFullName = seminars.get(ID).getSessionName();
+                            if(type == 0) System.out.println("Did you mean " + guessFullName + "? (Please respond with y/n)");
+                            else System.out.println("Did you mean " + guessFullName + " (Session ID: " + seminars.get(ID).getSessionID() + ")" + "? (Please respond with y/n and note there are duplicates of this session)");
+                            input = scan.nextLine();
+                            while(!input.equals("yes") && !input.equals("y") && !input.equals("no") && !input.equals("n")){
+                                System.out.println("Please respond with either yes or no");
+                                input = scan.nextLine();
+                            }
+                            if(input.equals("yes") || input.equals("y")){
+                                //System.out.println("\n" + guessFullName);
+                                return ID;
+                            }
+                            guessIndex--;
+                            guess = splitNames.get(guessIndex)[0];
+                        }
+
+                        //If all possible same guesses are responded with no then return -1 because there is no possible match
+                        return -1;
+                    }
+                    
+                }
+
+                //guess too high then adjust upper bound
+                else if(guess.compareTo(search) > 0){
+                    //If guess is too high then cut the list into half with highIndex at middle - 1
+                    highIndex = middle - 1;
+            
+                }
+
+                //guess too low then adjust lower bound
+                else if(guess.compareTo(search) < 0){
+                    //If guess is too low then cut the list into half with lowIndex at middle + 1
+                    lowIndex = middle + 1;
+                
+                }
+            }
+            
         }
 
         //Return -1 if match was not found in ArrayList

@@ -220,6 +220,15 @@ public class Seminar {
     }
 
     /*
+     * Setter method which sets sessionName
+     * Requires: String setSessionName
+     * Returns: void
+     */
+    public void setSessionName(String setSessionName){
+        sessionName = setSessionName;
+    }
+    
+    /*
      * Getter method which gets sessionID
      * Requires: none
      * Returns:int sessionID
