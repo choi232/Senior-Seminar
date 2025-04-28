@@ -181,6 +181,7 @@ public class SeniorSeminar {
                     //Iterate through column 3 until the end to parse student's choice data from CSV and place into Student object's choice ArrayList
                     //For loop to iterate through from column 3 until end
                     for(int i = 3; i < splitStr.length; i++){
+                        //Try block to parseInt and add sessionID's from CSV into choice ArrayList
                         try{
                             int sessionID = Integer.parseInt(splitStr[i]);
                             if(sessionID != -1 && !seminars.get(sessionID-1).getIsCut()){
@@ -199,12 +200,16 @@ public class SeniorSeminar {
 
                             
                         }
+                        //Catch block to catch NumberFormatException
                         catch(NumberFormatException e){
                         }
                     }
+                    //Create temp student from all the parsed data
                     Student tempStudent = new Student(name, email, time, studentID, choice);
+                    //Add student into students ArrayList
                     students.add(tempStudent);
                 }
+                //Increment studentIndex
                 studentIndex++;
             }
 
@@ -213,8 +218,10 @@ public class SeniorSeminar {
             sortedByPlacabilityStudents = (ArrayList) students.clone();
             sortedByNameStudents = (ArrayList) students.clone();
 
+            //close scanner object
             scan.close();
         } 
+        //Catch block to catch FileNotFoundException
         catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
@@ -222,18 +229,24 @@ public class SeniorSeminar {
 
     }
 
+    /*
+     * calculatePlacability() function to calculate the placability of each
+     * seminar and each student object in seminars and students ArrayList
+     */
     public void calculatePlacability(){
         //Placability it the total spots available in the seminar minus the students who want these spots
         //Calculate placability of each seminar
         for(int sessionIndex = 0; sessionIndex < seminars.size(); sessionIndex++){
             seminars.get(sessionIndex).setPlacability(16-seminars.get(sessionIndex).getNumEnrolled());
         }
-        //Calculate placability of each student
+        //Calculate placability of each student as the sum of all the student's seminar choice's placability
         for(int studentID = 0; studentID < students.size(); studentID++){
             int placability = 16;
             Student currStudent = students.get(studentID);
+            //Iterate through student's choices and sum placability of seminar choices
             for(int rank = 0, len = currStudent.getChoiceSize(); rank < len; rank++){
                 if(currStudent.getChoice(rank) != -1) placability -= seminars.get(currStudent.getChoice(rank)-1).getNumEnrolled();
+                //if student did not pick make placability as highest number possible 400
                 else placability = 16*25;
             }
             currStudent.setPlacability(placability);
@@ -241,22 +254,31 @@ public class SeniorSeminar {
         
     }
 
+    /*
+     * sortStudentsByPlacability() function to sort students
+     * by their placability score with a selection sort from lowest to highest
+     */
     public void sortStudentsByPlacability(){
+        //Calculate placability of all students
         calculatePlacability();
 
         //Sort each student by placability with selection sort from lowest to highest
 
         for(int i = 0, len = sortedByPlacabilityStudents.size(); i < len; i++){
+            //Variable trackers to find current lowest placability student in unsorted portion of ArrayList
             int currMinIndex = i;
             int currMinimum = sortedByPlacabilityStudents.get(i).getPlacability();
-
+            //Iterate through unsorted portion of ArrayList
             for(int j = i; j < sortedByPlacabilityStudents.size(); j++){
                 Student currStudent = sortedByPlacabilityStudents.get(j);
+                //compare placability of currStudent to currMinimum
                 if(currStudent.getPlacability() < currMinimum){
+                    //New currMinimum becomes currStudent if lower
                     currMinimum = currStudent.getPlacability();
                     currMinIndex = j;
                 }
             }
+            //Switch lowest student at end of each iteration with current position
             Student temp = sortedByPlacabilityStudents.get(i);
             sortedByPlacabilityStudents.set(i, sortedByPlacabilityStudents.get(currMinIndex));
             sortedByPlacabilityStudents.set(currMinIndex, temp);
@@ -264,82 +286,122 @@ public class SeniorSeminar {
 
     }
 
-    public void sortSeminarsByRandom(ArrayList<Seminar> arrayList){
-        //Sort each seminar by placability with selection sort from lowest to highest
-
-        for(int i = 0, len = arrayList.size(); i < len; i++){
-            int currMinIndex = i;
-            int currMinimum = arrayList.get(i).getRandom();
-
-            for(int j = i; j < arrayList.size(); j++){
-                Seminar currSeminar = arrayList.get(j);
-                if(currSeminar.getRandom() < currMinimum){
-                    currMinimum = currSeminar.getRandom();
-                    currMinIndex = j;
-                }
-            }
-            Seminar temp = arrayList.get(i);
-            arrayList.set(i, arrayList.get(currMinIndex));
-            arrayList.set(currMinIndex, temp);
-        }    }
-
+    /*
+     * sortSeminarsByPlacability(ArrayList<Seminar> arrayList) function to sort seminars
+     * by their placability score with a selection sort from lowest to highest
+     */
     public void sortSeminarsByPlacability(ArrayList<Seminar> arrayList){
         //Sort each seminar by placability with selection sort from lowest to highest
-
         for(int i = 0, len = arrayList.size(); i < len; i++){
+            //Variable trackers to find current lowest placability seminar in unsorted portion of ArrayList
             int currMinIndex = i;
             int currMinimum = arrayList.get(i).getPlacability();
-
+            //Iterate through unsorted portion of ArrayList
             for(int j = i; j < arrayList.size(); j++){
                 Seminar currSeminar = arrayList.get(j);
+                //compare placability of currSeminar to currMinimum
                 if(currSeminar.getPlacability() < currMinimum){
+                    //New currMinimum becomes currSeminar if lower
                     currMinimum = currSeminar.getPlacability();
                     currMinIndex = j;
                 }
             }
+            //Switch lowest seminar at end of each iteration with current position
             Seminar temp = arrayList.get(i);
             arrayList.set(i, arrayList.get(currMinIndex));
             arrayList.set(currMinIndex, temp);
         }
     }
 
+
+    /*
+     * sortSeminarsByRandom(ArrayList<Seminar> arrayList) sorts inputted Seminar ArrayList by random attribute
+     * using selection sort from lowest to highest using the random int attribute within the Seminar class
+     */
+    public void sortSeminarsByRandom(ArrayList<Seminar> arrayList){
+        //Sort each seminar by placability with selection sort from lowest to highest
+        //Iterate through ArrayList
+        for(int i = 0, len = arrayList.size(); i < len; i++){
+            //Variable trackers to find current lowest random attribute Seminar in unsorted portion of ArrayList
+            int currMinIndex = i;
+            int currMinimum = arrayList.get(i).getRandom();
+            //Iterate through unsorted portion of ArrayList
+            for(int j = i; j < arrayList.size(); j++){
+                Seminar currSeminar = arrayList.get(j);
+                //compare random attribute of currSeminar to currMinimum
+                if(currSeminar.getRandom() < currMinimum){
+                    //New currMinimum becomes currSeminar if lower
+                    currMinimum = currSeminar.getRandom();
+                    currMinIndex = j;
+                }
+            }
+            //Switch lowest random attribute seminar at end of each iteration with current position
+            Seminar temp = arrayList.get(i);
+            arrayList.set(i, arrayList.get(currMinIndex));
+            arrayList.set(currMinIndex, temp);
+        }    
+    }
+
+    /*
+     * isPlaced(Student student, int sessionID) takes in Student student and int sessionID and returns
+     * boolean to tell if the student's seminars ArrayList already has the seminar with inputted sessionID
+     */
     public boolean isPlaced(Student student, int sessionID){
         //Iterate through placed seminars from student schedule and see if they have a match with the passed argument sessionID
-        //Also check if any duplicates have a match with the argument sessionID as well
         for(int i = 0, len = student.getSeminarsIndex(); i < len; i++){
             int currSessionID = student.getSeminar(i).getSessionID();
             int duplicateSessionID = student.getSeminar(i).getDuplicate();
+            //Check if sessionID matches with current iteration of seminar
             if(currSessionID == sessionID){
                 return true;
             }
+            //Also check if any duplicates have a match with the argument sessionID as well
             else if(duplicateSessionID == sessionID){
                 return true;
             }
         }
+        //return false if no matches were found
         return false;
     }
 
+    /*
+     * placeStudents(Seminar[][] schedule) takes in a schedule and places students into
+     * all the seminars within the schedule and returns a double representative of the average
+     * courses requested and received per student
+     */
     public double placeStudents(Seminar[][] schedule){
-
+        //How many seminars the student requested and received
         int totalMatchedSeminars = 0;
 
         //iterates through every student
         for(int studentID = 0; studentID < sortedByPlacabilityStudents.size(); studentID++){
             Student currStudent = sortedByPlacabilityStudents.get(studentID);
-            
+            //Quadruple for loop consisting of for loop through students, double for loop for schedule, and also a for loop through Arraylist of Student choices
+            //Iterate through all the rows of the schedule
             for(int row = 0; row < 5; row++){
+                //isFilled boolean flag tells if the student has been placed in a given timeslot
                 boolean isFilled = false;
+                //iterate through all the cols of the schedule
                 outer: for(int col = 0; col < 5; col++){
+                    //iterate through all the choices in the choice ArrayList
                     for(int rank = 0, len = currStudent.getChoiceSize(); rank < len; rank++){
+                        //Creation of variables representing current seminar, choice and index
                         Seminar currSeminar = schedule[row][col];
                         int currChoice = currStudent.getChoice(rank);
                         int studentIndex = currSeminar.getStudentsIndex();
+                        //If the seminar is full set isFull to true
                         if(studentIndex == 16) currSeminar.setIsFull(true);
+                        //If seminar is able to be placed in student then place it
                         if(currChoice == currSeminar.getSessionID() && !isPlaced(currStudent, currChoice) && !currSeminar.getIsFull()){
+                            //If seminar can be placed then place the seminar into the student
                             currStudent.addSeminar(currSeminar);
+                            //Place the student into the seminar
                             currSeminar.addStudent(currStudent);
+                            //increment totalMatchedSeminars
                             totalMatchedSeminars++;
+                            //If student is placed for this timeslot then isFilled is true
                             isFilled = true;
+                            //break out of current timeslot
                             break outer;
                         }
                         
@@ -348,17 +410,22 @@ public class SeniorSeminar {
 
                 //If student cannot be placed out of choices then place them into least popular course available in given timeslot
                 if(!isFilled){
+                    //Create timeslotSeminars the five seminars in this current timeslot
                     ArrayList<Seminar> timeslotSeminars = new ArrayList<Seminar>();
                     for(int col = 0; col < 5; col++){
                         timeslotSeminars.add(schedule[row][col]);
                     }
+                    //Sort current timeslot of seminars by placability
                     sortSeminarsByPlacability(timeslotSeminars);
 
                     //Iterate backwards through sorted array to pick least popular session
                     for(int timeslotIndex = 4; timeslotIndex >= 0; timeslotIndex--){
                         Seminar currSeminar = timeslotSeminars.get(timeslotIndex);
+                        //If the seminar has available space place the student into the seminar and seminar into the student
                         if(!currSeminar.getIsFull()){
+                            //Place seminar into student
                             currStudent.addSeminar(currSeminar);
+                            //Place student into seminar
                             currSeminar.addStudent(currStudent);
                             break;
                         }
@@ -377,118 +444,168 @@ public class SeniorSeminar {
     }
     
     /*
-     * createRandomSchedule() creates a random schedule by assigning every seminar a random number
+     * createRandomSchedule(ArrayList<Seminar> popularSeminars) returns a Seminar[][] randomSchedule by assigning every seminar a random number
      * and sorting the seminars by this random number from least to greatest with selection sort.
      * Finally, this random order is placed into a schedule of 5x5 in sequentially in the random order placed by the selection sort.
      */
     public Seminar[][] createRandomSchedule(ArrayList<Seminar> popularSeminars){
+        //Set the random attribute for all the seminars in seminars ArrayList
         for(int i = 0, len = seminars.size(); i < len; i++){
             seminars.get(i).setRandom();
         }
         //Sort random numbers from lowest to highest to create a new random order to add to schedule in this new pseudorandom sorted order
         sortSeminarsByRandom(popularSeminars);
 
+        //Create new randomSchedule
         Seminar[][] randomSchedule = new Seminar[5][5];
+        //Iterate through randomSchedule with a double for loop and set random Seminar
         for(int row = 0, seminarIndex = 0; row < 5; row++){
             for(int col = 0; col < 5; col++){
+                //Place random seminar into schedule position
                 randomSchedule[row][col] = popularSeminars.get(seminarIndex);
+                //Increment seminarIndex
                 seminarIndex++;
             }
         }
-
+        //Return randomSchedule now reseeded with random seminars
         return randomSchedule;
     }
 
+    /*
+     * resetData() function resets all the changed attributes from placeStudents() function.
+     * It basically allows optimizeSchedule to run multiple times by resetting the changed attributes.
+     */
     public void resetData(){
+        //Iterate through every student and resetSeminars()
         for(int studentID = 0, len = students.size(); studentID < len; studentID++){
             students.get(studentID).resetSeminars();
-            
         }
+        //Iterate through every seminar and resetStudents() 
         for(int seminarIndex = 0, len = seminars.size(); seminarIndex < len; seminarIndex++){
             seminars.get(seminarIndex).resetStudents();
+            //Make sure all the seminars are set as not full
             seminars.get(seminarIndex).setIsFull(false);
         }
     }
 
+    /*
+     * optimizeSchedule() function optimizes a schedule by creating random schedules for however many times the user requests.
+     * At each random schedule, we run the placeStudents() function and check if the returned optimization value is higher than or
+     * equal to the inputted optimization value. Finally, once all the iterations are run or the optimization value is met (whichever comes first)
+     * then we write the optimized schedule into saved schedules CSV.
+     */
     public void optimizeSchedule(){
+        //Variable for how many times the user wants to run schedules
         int stop;
+        //Create scanner object
         Scanner scan = new Scanner(System.in);
 
+        //Print out Senior Seminar introduction
         System.out.println("Welcome to Senior Seminar! This program will optimize a schedule to minimize course conflicts between a student's requested courses and scheduled courses.");
         System.out.println("This program relies on an optimization value which is the average requested courses a student receives out of five.");
         System.out.println("The program seeks to maximize this value by running possible iterations of randomly generated schedules and then running a placing algorithm and calculating the average courses placed.");
 
+        //Prompt and save input and do input validation
         System.out.println("\nTo begin creating a schedule, please enter an integer between one and one million iterations that you would like to run: ");
         String input = scan.nextLine();
+        //Input validation for the amount of times the program should run
         while(true){
+            //Try block to parseInt and check if stop value is within 1 and 1 million
             try {
                 stop = Integer.parseInt(input);
                 if(stop < 1 || stop > 1000000) System.out.println("Please enter a valid integer input for how many iterations you would like to run from one to one million: ");
                 else break;
                 input = scan.nextLine();
-            } catch (NumberFormatException e) {
+            } 
+            //Catch block to catch NumberFormatException
+            catch (NumberFormatException e) {
                 System.out.println("Please enter a valid integer input for how many iterations you would like to run from one to one million: ");
                 input = scan.nextLine();
             }
         }
+
+        //Prompt and save input and do input validation
         System.out.println("Please input an optimization value (the program will stop early if this value is reached): ");
         double optimizationValue;
+        //Seems like the max value that I can get from my placing algorithm without the computer taking forever is 4.2
         input = scan.nextLine();
+        //Input validation for the inputted optimization value the program should try to hit
         while(true){
+            //Try block to parseInt and check if optimizationValue is within (0, 5)
             try {
                 optimizationValue = Double.parseDouble(input);
                 if(optimizationValue < 0 || optimizationValue > 5) System.out.println("Please enter a valid double input from 0 to 5: ");
                 else break;
                 input = scan.nextLine();
-            } catch (NumberFormatException e) {
+            }
+            //Catch block to catch NumberFormatException 
+            catch (NumberFormatException e) {
                 System.out.println("Please enter a valid double input from 0 to 5: ");
                 input = scan.nextLine();
             }
         }
 
-        //Seems like the max value that I can get from my placing algorithm without the computer taking forever is 4.2
-        //double optimizationValue = 4.2;
         //ArrayList of top 25 popular seminars (ArrayList accounts for max two sessions and min one session per professor rule)
         ArrayList<Seminar> popularSeminars = new ArrayList<Seminar>();
 
-
+        //Iterate through seminars and add only seminars that will be used in a schedule to popularSeminars ArrayList
         for(int i = 0, len = seminars.size(); i < len; i++){
             //Check if seminars is to be cut and if not add into top 25 popular seminars
             if(!seminars.get(i).getIsCut()){
                 popularSeminars.add(seminars.get(i));
             }
         }
+
+        //Create randomSchedule
         Seminar[][] randomSchedule;
 
+        //Counter to keep track of how many times program is ran
         int counter = 0;
+
+        //Iterate through program and check when to break out of loop
         while(true){
+            //Set randomSchedule to return of createRandomSchedule()
             randomSchedule = createRandomSchedule(popularSeminars);
+            //currOptimization is the double return of placeStudents()
             double currOptimization = placeStudents(randomSchedule);
+            //Increment counter
             counter++;
+            
+            //For first iteration of program save schedule
             if(counter == 1){
+                //Save optimization value
                 optimizedCourseAvg = currOptimization;
+                //Save schedule
                 optimizedSchedule = randomSchedule;
             }
 
+            //If the currOptimization is better than highest optimizedCourseAvg then save currOptimization as new highest
             if(currOptimization > optimizedCourseAvg){
+                //Save optimization value
                 optimizedCourseAvg = currOptimization;
+                //Save schedule
                 optimizedSchedule = randomSchedule;
             }
 
+            //If currOptimization is greater than the inputted optimization value then break out of program and print schedule / save data into variables
             if(currOptimization >= optimizationValue){
                 System.out.println("\nThe program has ran through " + counter + " times and generated a schedule of " + optimizedCourseAvg + " optimization value");
                 break;
             }
+
+            //If the program has run through the total amount of iterations then break out of programa and print / save data of the highest optimized schedule
             if(counter == stop){
                 System.out.println();
                 System.out.println("\nThe program has ran through " + counter + " times and generated a schedule of " + optimizedCourseAvg + " optimization value");
                 break;
             }
 
+            //reset all changed data if this randomSchedule is not good
             resetData();
 
 
         }
+
         //Print schedule
         System.out.println();
         for(int row = 0; row < 5; row++){
@@ -498,32 +615,46 @@ public class SeniorSeminar {
             }
         }
 
+        //Try block to write into saved schedules CSVs
         try {
             //File title is optimization value + Schedules.csv so that data can be saved for any optimization value
             //Second argument true creates FileWriter as an appending FileWriter object so data can be saved and not overwritten
             FileWriter myWriter;
             myWriter = new FileWriter("Saved Schedules/" + ((int)(optimizedCourseAvg*10)/10.0) + "Schedules.csv", true);
+            //Iterate through entire schedule and write sessionID of every Seminar in schedule through order
             for(int row = 0; row < 5; row++){
                 for(int col = 0; col < 5; col++){
+                    //Appends timeslots of seminars into CSV
                     if(col != 4) myWriter.append(randomSchedule[row][col].getSessionID() + ",");
                     else myWriter.append(randomSchedule[row][col].getSessionID()+"\n");
                 }
             }
             myWriter.append("\n");
+            //Close myWriter FileWriter object
             myWriter.close();
+            //Tell user the optimizedCourseAvg and the file has been saved
             System.out.println("\nSchedule saved to " + ((int)(optimizedCourseAvg*10)/10.0) + "Schedules.csv");
-          } catch (IOException e) {
+          } 
+          //Catch block to catch IOException
+          catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
           }
     }
 
+    /*
+     * sortByName() sorts sortedByNameStudents ArrayList of Students and Seminars by alphabetical order
+     * for further use in binarySearchByName() with a selection sort using lexographical comparison
+     */
+
     public void sortByName(){
-        
+        //Sort each student by alphabet with selection sort from lowest to highest
+        //Iterate through double for loop of selection sort
         for(int i = 0, len = sortedByNameStudents.size(); i < len; i++){
+            //Variable trackers to find current lowest alphabetic student in unsorted portion of ArrayList
             int currMinIndex = i;
             String currMinimum = sortedByNameStudents.get(i).getName().toLowerCase();
-
+            //Iterate through unsorted portion of ArrayList
             for(int j = i; j < sortedByNameStudents.size(); j++){
                 Student currStudent = sortedByNameStudents.get(j);
                 //Lexographically compare currentStudent's name with currMinimum name
@@ -533,71 +664,92 @@ public class SeniorSeminar {
                     currMinIndex = j;
                 }
             }
+            //Switch lowest student at end of each iteration with current position
             Student temp = sortedByNameStudents.get(i);
             sortedByNameStudents.set(i, sortedByNameStudents.get(currMinIndex));
             sortedByNameStudents.set(currMinIndex, temp);
         }
     
-    
+        //Second selection sort for Seminars
+        //Sort each seminar by alphabet with selection sort from lowest to highest
+        //Iterate through double for loop of selection sort
         for(int i = 0, len = sortedByNameSeminars.size(); i < len; i++){
+            //Variable trackers to find current lowest alphabetic seminar in unsorted portion of ArrayList
             int currMinIndex = i;
             String currMinimum = sortedByNameSeminars.get(i).getSessionName().toLowerCase();
-
+            //Iterate through unsorted portion of ArrayList
             for(int j = i; j < sortedByNameSeminars.size(); j++){
                 Seminar currSeminar = sortedByNameSeminars.get(j);
-                //Lexographically compare currentStudent's name with currMinimum name
+                //Lexographically compare currentSeminar's name with currMinimum name
                 if(currSeminar.getSessionName().toLowerCase().compareTo(currMinimum) < 0){
-                    //If currStudent's name comes before currMinimum's name then swap the two
+                    //If currSeminar's name comes before currMinimum's name then swap the two
                     currMinimum = currSeminar.getSessionName().toLowerCase();
                     currMinIndex = j;
                 }
             }
+            //Switch lowest seminar at end of each iteration with current position
             Seminar temp = sortedByNameSeminars.get(i);
             sortedByNameSeminars.set(i, sortedByNameSeminars.get(currMinIndex));
             sortedByNameSeminars.set(currMinIndex, temp);
         }
-        // System.out.println(sortedByNameSeminars.size());
-        // for(int j = 0; j < sortedByNameSeminars.size(); j++){
-        //     System.out.println(sortedByNameSeminars.get(j).getSessionName());
-        // }
     }
 
+    /*
+     * sortSplitNames(ArrayList<String[]> splitNames) sorts splitNames Arraylist<String>
+     * by alphabetical order for further use in binarySearchByName() with a selection sort 
+     * using lexographical comparison
+     */
     public ArrayList<String[]> sortSplitNames(ArrayList<String[]> splitNames){
         for(int i = 0, len = splitNames.size(); i < len; i++){
+            //Variable trackers to find current lowest alphabetic partial name in unsorted portion of ArrayList splitNames
             int currMinIndex = i;
             String currMinimum = splitNames.get(i)[0];
-
+            //Iterate through unsorted portion of ArrayList
             for(int j = i; j < splitNames.size(); j++){
                 String currName = splitNames.get(j)[0];
-                //Lexographically compare currentStudent's name with currMinimum name
+                //Lexographically compare currName with currMinimum name
                 if(currName.compareTo(currMinimum) < 0){
-                    //If currStudent's name comes before currMinimum's name then swap the two
+                    //If currName comes before currMinimum's name then swap the two
                     currMinimum = splitNames.get(j)[0];
                     currMinIndex = j;
                 }
             }
+            //Switch lowest partial name at end of each iteration with current position
             String[] temp = splitNames.get(i);
             splitNames.set(i, splitNames.get(currMinIndex));
             splitNames.set(currMinIndex, temp);
         }
-
+        //return sorted ArrayList of Strings splitNames
         return splitNames;
     }
 
+    /*
+     * binarySearchByName(String name, int type) takes in a name to search for as well as a type either 0 or 1.
+     * The type will search either students (0) or seminars (1) depending on int type. Then it will use a binary
+     * search to search for the name with a direct match in all of the possible names. If a direct match is not possible
+     * the function will split all the seminar/student names as well as the inputted name using a space delimiter and search
+     * for any possible matches and ask the user if any of these matches are the seminar or student the user is searching for.
+     * The binarySearch disregards any upper or lower case because it converts everything to lower case.
+     */
     public int binarySearchByName(String name, int type){
         //This method will search for the name twice, the first time it will look for an exact match
         //of the inputted name but the second time it will search for any matches of first, middle or last name
+
+        //Creation of scanner object
         Scanner scan = new Scanner(System.in);
 
+        //Creation of Necessary Variables for Binary Search
         String search = name.toLowerCase();
         int lowIndex = 0; //lower bound of possible values
-        int highIndex;
+        int highIndex; //Upper bound of possible values
         if(type == 0) highIndex = sortedByNameStudents.size()-1; //upper bound of possible values
         else highIndex = sortedByNameSeminars.size()-1;
         boolean isFound = false; //bool flag for if searching value is not in data set
         int middle, counter = 0;
+        //Inputted guess
         String guess;
 
+        //FIRST ATTEMPT SEARCH FOR A DIRECT MATCH
         //Size of ArrayList is greater than zero
         while(highIndex - lowIndex + 1 > 0){ 
             counter++;
@@ -626,9 +778,10 @@ public class SeniorSeminar {
             }
         }
 
-
+        //If direct match is not found split all the names of seminar/student
         ArrayList<String[]> splitNames = new ArrayList<String[]>();
 
+        //If type (0) student then iterate through all students and split the names of all the students by space delimiter
         if(type == 0){
             for(int i = 0, len = students.size(); i < len; i++){
                 String studentID = students.get(i).getStudentID() + "";
@@ -643,7 +796,8 @@ public class SeniorSeminar {
                 }
             }
         }
-
+        
+        //If type(1) seminar then iterate through all seminars and split the names of all the seminars by space delimiter
         else{
             for(int i = 0, len = seminars.size(); i < len; i++){
                 String studentID = seminars.get(i).getSessionID() + "";
@@ -656,15 +810,12 @@ public class SeniorSeminar {
             } 
         }
 
+        //set splitNames to a sorted version using sortSplitNames
         splitNames = sortSplitNames(splitNames);
-
-        for(int i = 0; i < splitNames.size(); i++){
-            System.out.println(splitNames.get(i)[0] + "  " + splitNames.get(i)[1]);
-        }
 
         String[] splitInputtedName = name.split(" ");
 
-
+        //Iterate through binary search with splitInputtedNames by comparing to splitNames ArrayList
         for(int i = 0; i < splitInputtedName.length; i++){
             lowIndex = 0; //lower bound of possible values
             highIndex = splitNames.size()-1; //upper bound of possible values
@@ -680,11 +831,14 @@ public class SeniorSeminar {
                 //check if guess is right
                 if(guess.compareTo(search) == 0){
                     int ID;
+                    //Save data into ID depending on type 0 or 1
                     if(type == 0) ID = Integer.parseInt(splitNames.get(middle)[1]);
                     else ID = Integer.parseInt(splitNames.get(middle)[1]) - 1;
                     String guessFullName;
                     if(type == 0) guessFullName = students.get(ID).getName();
                     else guessFullName = seminars.get(ID).getSessionName();
+
+                    //User prompting and input validation
                     if(type == 0) System.out.println("Did you mean " + guessFullName + "? (Please respond with y/n)");
                     else System.out.println("Did you mean " + guessFullName + " (Session ID: " + seminars.get(ID).getSessionID() + ")" + "? (Please respond with y/n and note there are duplicates of this session)");
                     String input = scan.nextLine();
@@ -693,7 +847,7 @@ public class SeniorSeminar {
                         input = scan.nextLine();
                     }
                     if(input.equals("yes") || input.equals("y")){
-                        //System.out.println("\n" + guessFullName);
+                        //If a match return ID
                         return ID;
                     }
                     //if responds with no must search through all possible same partial names and ask
@@ -703,12 +857,13 @@ public class SeniorSeminar {
                         if(guessIndex > 0 && guessIndex < splitNames.size()) guess = splitNames.get(guessIndex)[0];
                         //Check all possible same guesses by iterating forwards
                         while(guess.equals(search) && guessIndex > 0 && guessIndex < splitNames.size()){
+                            //Save data into ID depending on type 0 or 1
                             if(type == 0) ID = Integer.parseInt(splitNames.get(guessIndex)[1]);
                             else ID = Integer.parseInt(splitNames.get(guessIndex)[1]) - 1;
-
                             if(type == 0) guessFullName = students.get(ID).getName();
                             else guessFullName = seminars.get(ID).getSessionName();
-
+                            
+                            //User prompting and input validation
                             if(type == 0) System.out.println("Did you mean " + guessFullName + "? (Please respond with y/n)");
                             else System.out.println("Did you mean " + guessFullName + " (Session ID: " + seminars.get(ID).getSessionID() + ")" + "? (Please respond with y/n and note there are duplicates of this session)");
                             input = scan.nextLine();
@@ -717,23 +872,27 @@ public class SeniorSeminar {
                                 input = scan.nextLine();
                             }
                             if(input.equals("yes") || input.equals("y")){
-                                //System.out.println("\n" + guessFullName);
+                                //If a match return ID
                                 return ID;
                             }
+                            //increment guessIndex
                             guessIndex++;
+                            //change guess value
                             guess = splitNames.get(guessIndex)[0];
                         }
 
                         //Check all possible same guesses by iterating backwards
-
                         guessIndex = middle-1;
                         if(guessIndex > 0 && guessIndex < splitNames.size()) guess = splitNames.get(guessIndex)[0];
                         while(guess.equals(search) && guessIndex > 0 && guessIndex < splitNames.size()){
+                            
+                            //Save data into ID depending on type 0 or 1
                             if(type == 0) ID = Integer.parseInt(splitNames.get(guessIndex)[1]);
                             else ID = Integer.parseInt(splitNames.get(guessIndex)[1]) - 1;
-
                             if(type == 0) guessFullName = students.get(ID).getName();
                             else guessFullName = seminars.get(ID).getSessionName();
+
+                            //User prompting and input validation
                             if(type == 0) System.out.println("Did you mean " + guessFullName + "? (Please respond with y/n)");
                             else System.out.println("Did you mean " + guessFullName + " (Session ID: " + seminars.get(ID).getSessionID() + ")" + "? (Please respond with y/n and note there are duplicates of this session)");
                             input = scan.nextLine();
@@ -742,10 +901,12 @@ public class SeniorSeminar {
                                 input = scan.nextLine();
                             }
                             if(input.equals("yes") || input.equals("y")){
-                                //System.out.println("\n" + guessFullName);
+                                //If a match return ID
                                 return ID;
                             }
+                            //decrement guessIndex
                             guessIndex--;
+                            //change guess value
                             guess = splitNames.get(guessIndex)[0];
                         }
 
@@ -759,7 +920,6 @@ public class SeniorSeminar {
                 else if(guess.compareTo(search) > 0){
                     //If guess is too high then cut the list into half with highIndex at middle - 1
                     highIndex = middle - 1;
-            
                 }
 
                 //guess too low then adjust lower bound
@@ -882,7 +1042,7 @@ public class SeniorSeminar {
                     id++;
                 }
                 else{
-                    System.out.println("Please enter the student ID you would like to search: ");
+                    System.out.println("Please enter the sessionID you would like to search: ");
                     input = scan.nextLine();
                     while(true){
                         try {
@@ -904,8 +1064,9 @@ public class SeniorSeminar {
                 System.out.println("Session ID: " + seminar.getSessionID());
                 System.out.println();
 
+                System.out.println(seminar.getStudentsIndex());
                 System.out.println("Enrolled Students: ");
-                for(int i = 0; i < 16; i++){
+                for(int i = 0; i < seminar.getStudentsIndex(); i++){
                     System.out.println(seminar.getStudent(i).getName() + " (StudentID: " + seminar.getStudent(i).getStudentID() + ")");
                 }
             }

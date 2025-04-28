@@ -154,7 +154,7 @@ public class Seminar {
     public Student getStudent(int index){
         return students[index];
     }
-
+    
     /*
      * Setter method which adds Student object in students array and also increments studentIndex by 1 to update current position of students in array
      * Requires: Student object
