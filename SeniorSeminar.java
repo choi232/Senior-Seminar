@@ -16,102 +16,170 @@ import java.util.Scanner;             // Import IOException to catch IOException
  * saving the schedule into a corresponding schedule CSV file
  * **/
 
+
+/*
+ * SeniorSeminar class to run all necessary functions to run optimization program. An object of Senior Seminar
+ * is created in main and run with the runSeniorSeminar()
+ */
 public class SeniorSeminar {
 
+    //Creation of seminars and students ArrayList to store all seminars and students pulled from csv
     ArrayList<Student> students = new ArrayList<Student>();
     ArrayList<Seminar> seminars = new ArrayList<Seminar>();
 
+    //Creation of sortedSeminars and sortedStudents which are the same students and seminars just sorted by placability and by name
     ArrayList<Student> sortedByPlacabilityStudents;
     ArrayList<Student> sortedByNameStudents;
     ArrayList<Seminar> sortedByNameSeminars = new ArrayList<Seminar>();
 
+    //Saves best schedule and its optimized course average into these variables
     Seminar[][] optimizedSchedule;
     double optimizedCourseAvg;
 
+    /*
+     * runSeniorSeminar() assembles all the necessary functions required to run the program so that
+     * the Senior Seminar program can be run from a single function
+     */
     public void runSeniorSeminar(){
+        //Load in intial CSV
         loadCSV();
+
+        //Optimize schedule
         sortStudentsByPlacability();
         optimizeSchedule();
+
+        //Printing functions
         sortByName();
         printMasterSchedule();
         printSessionRoster();
         printStudentSchedule();
-        
-
     }
-    
+
+    /*
+     * loadCSV() loads all the data from the CSV into student and seminar objects which are then 
+     * subsequently added to the students and seminars ArrayLists
+     */
     public void loadCSV(){
 
         //Creates Seminar objects from the file and adds them into seminar
+        //try block to load seminar.csv data
         try {
+            //Create File object from csv/seminar.csv
             File seminarCSV = new File("csv/seminar.csv");
+            //Create scanner object
             Scanner scan = new Scanner(seminarCSV);
-            int studentIndex = -1;
+            //Create seminarIndex to track where in seminars ArrayList we currently are
+            //Starts at -1 because the first iteration is skipped because of the column titles in the CSV
+            int seminarIndex = -1;
+            //Number of duplicates counted in the seminar.csv
             int numDuplicates = 0;
+
             //while loop which runs through every line of the csv with scan.hasNextLine()
             while (scan.hasNextLine()) { 
+                //Turn csv line data into a String
                 String data = scan.nextLine();
-                if(studentIndex > -1){
+
+                //If the data from the scanned line of the csv is not the column titles parse the csv data and create a seminar object and add to seminars
+                if(seminarIndex > -1){
+                    //Split data into string with delimiter ","
                     String[] splitStr = data.split(",");
                     
+                    //Parse splitStr into different types of data
+                    //Create required variables and important variables to create Seminar object
                     String sessionName = splitStr[0];
                     int sessionID = Integer.parseInt(splitStr[1]);
                     String presenterName = splitStr[2];
                     int spots = Integer.parseInt(splitStr[3]);
                     
+                    //Create a temp seminar from parsed data
                     Seminar tempSeminar = new Seminar(sessionName, sessionID, presenterName);
-                    //If not a seminar decided to be cut
+
+                    //If not the seminar is decided to have a duplicate based on available spots then add duplicate sessionID into duplicate attribute and increment numDuplicates
                     if(spots == 32){
+                        //Add duplicate sessionID into duplicate attribute
                         tempSeminar.setDuplicate(numDuplicates + 19);
+                        //increment numDuplicates
                         numDuplicates++;
                     }
+
+                    //Otherwise if the session has no spots / meant to be cut set the isCut flag boolean to true
                     else if(spots == 0) tempSeminar.setIsCut(true);
                         
+                    //Add created Seminar object into seminars ArrayList
                     seminars.add(tempSeminar);
                     
                 }
-                studentIndex++;
+                //Increment seminarIndex after adding a seminar into seminars ArrayList to track curr position in ArrayList 
+                seminarIndex++;
             }
+
+            //For every single seminar with a duplicate session iterate through and create a duplicate seminar
+            //Iterate through seminars ArrayList and find seminars with a duplicate AKA duplicate != -1
             for(int i = 0, len = seminars.size(), sessionID = 19; i < len; i++){
+                //If seminar has a duplicate create a new duplicate seminar
                 if(seminars.get(i).getDuplicate() != -1){
+                    //currSeminar within seminars ArrayList
                     Seminar currSeminar = seminars.get(i);
+                    //Create a new duplicate seminar with a sessionID from 19-27 depending on when created
                     Seminar tempSeminar = new Seminar(currSeminar.getSessionName(), sessionID, currSeminar.getPresenterName());
+                    //Set duplicate sessionID of original seminar
                     tempSeminar.setDuplicate(sessionID-18);
+                    //Add seminar into seminars ArrayList
                     seminars.add(tempSeminar);
+                    //Increment sessionID after a duplicate session is added
                     sessionID++;
                 }
             }
             
+            //Iterate through for loop to see which seminars are the top 25 selected seminars in schedule
             for(int i = 0, len = seminars.size(); i < len; i++){
-                //Check if seminars is to be cut and if not add into top 25 popular seminars
+                //Check if seminars is to be cut and if not add into top 25 popular seminars for sortedByNameSeminars
                 if(!seminars.get(i).getIsCut()){
+                    //sortedByNameSeminars is a different ArrayList for a later binary search which we initialize with only seminars that are in the final schedule
                     sortedByNameSeminars.add(seminars.get(i));
                 }
             }
+            //Close scanner
             scan.close();
         } 
+
+        //Catch block to catch FileNotFoundException errors
         catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
 
         //Creates Student objects from the file and adds them into students ArrayList
+        //Try block to load csv/student.csv data into corresponding Student objects
         try {
+            //Create File object from csv/seminar.csv
             File studentCSV = new File("csv/student.csv");
+            //Create scanner object
             Scanner scan = new Scanner(studentCSV);
+            //Create studentIndex to track where in students ArrayList we currently are
+            //Starts at -1 because the first iteration is skipped because of the column titles in the CSV
             int studentIndex = -1;
+
             //while loop which runs through every line of the csv with scan.hasNextLine()
             while (scan.hasNextLine()) { 
+                //Turn csv line data into a String                
                 String data = scan.nextLine();
+
+                //If the data from the scanned line of the csv is not the column titles parse the csv data and create a student object and add to students
                 if(studentIndex > -1){
+                    //Split data into string with delimiter ","
                     String[] splitStr = data.split(",");
                     
+                    //Parse splitStr into different types of data
+                    //Create required variables and important variables to create Student object
                     String time = splitStr[0];
                     String email = splitStr[1];
                     String name = splitStr[2];
                     int studentID = studentIndex;
                     ArrayList<Integer> choice = new ArrayList<Integer>();
                     
+                    //Iterate through column 3 until the end to parse student's choice data from CSV and place into Student object's choice ArrayList
+                    //For loop to iterate through from column 3 until end
                     for(int i = 3; i < splitStr.length; i++){
                         try{
                             int sessionID = Integer.parseInt(splitStr[i]);
@@ -307,7 +375,12 @@ public class SeniorSeminar {
         //Return avgCoursePlacement
         return avgCoursePlacement;
     }
-
+    
+    /*
+     * createRandomSchedule() creates a random schedule by assigning every seminar a random number
+     * and sorting the seminars by this random number from least to greatest with selection sort.
+     * Finally, this random order is placed into a schedule of 5x5 in sequentially in the random order placed by the selection sort.
+     */
     public Seminar[][] createRandomSchedule(ArrayList<Seminar> popularSeminars){
         for(int i = 0, len = seminars.size(); i < len; i++){
             seminars.get(i).setRandom();
