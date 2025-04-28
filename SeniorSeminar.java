@@ -50,7 +50,6 @@ public class SeniorSeminar {
 
         //Printing functions
         sortByName();
-        printMasterSchedule();
         printSessionRoster();
         printStudentSchedule();
     }
@@ -937,139 +936,175 @@ public class SeniorSeminar {
     
     }
 
+    /*
+     * printStudentSchedule() prompts the user to search for student by studentID or name 
+     * and then prints the corresponding student's schedule
+     */
     public void printStudentSchedule(){
         Scanner scan = new Scanner(System.in);
+        //Continuously asks if user wants to see another student's schedule until user responds with no
         while(true){
+            //User prompting and input validation
             System.out.println();
             System.out.println("Would you like to search up a student's schedule? (Please respond with either yes or no)");
             String input = scan.nextLine();
+            //Input validation of yes or no
             while(!input.equals("yes") && !input.equals("y") && !input.equals("no") && !input.equals("n")){
                 System.out.println("Please respond with either yes or no");
                 input = scan.nextLine();
             }
-
+            //If user inputs yes then ask method of searching student by name or by id 
             if(input.equals("yes") || input.equals("y")){
                 System.out.println("Would you like to search up a student by name (first and/or last name) or by student ID? Please enter \"name\" or \"id\": ");
                 input = scan.nextLine();
+                //Input validation of name or id
                 while(!input.equals("name") && !input.equals("id")){
                     System.out.println("Please respond with either \"name\" or \"id\"");
                     input = scan.nextLine();
                 }
                 int id;
+                //if by name then use binarySearchByName function to find studentID and then print corresponding student
                 if(input.equals("name")){
                     System.out.println("Please enter the name you would like to search: ");
                     input = scan.nextLine();
+                    //Calling binarySearchByName() to find studentID
                     id = binarySearchByName(input, 0);
+                    //User input validation
                     while(id == -1){
                         System.out.println("Match not found please enter a new name to search or press \"q\" to quit: ");
                         input = scan.nextLine();
-                        if(input.equals("q")) return;
+                        //User presses q then get out of current loop
+                        if(input.equals("q")) break;
+                        //Calling binarySearchByName() to find studentID
                         id = binarySearchByName(input, 0);
                     }
+                    //increment id
                     id++;
                 }
+                //User prompts to search directly with studentID
                 else{
+                    //Prompting
                     System.out.println("Please enter the student ID you would like to search: ");
                     input = scan.nextLine();
+                    //User input validation
                     while(true){
+                        //Try block for parseInt
                         try {
                             id = Integer.parseInt(input);
+                            //Ensures an integer from 1-74 is passed
                             if(id < 1 || id > 74) System.out.println("Please enter a valid integer input for student ID from 1-74");
                             else break;
                             input = scan.nextLine();
-                        } catch (NumberFormatException e) {
+                        } 
+                        //Catch block for NumberFormatException
+                        catch (NumberFormatException e) {
                             System.out.println("Please enter a valid integer input for student ID from 1-74");
                             input = scan.nextLine();
                         }
                     }
                 }
-
-                Student student = students.get(id-1);
-                System.out.println();
-                System.out.println("Student Name: " + student.getName());
-                System.out.println("Student Email: " + student.getEmail());
-                System.out.println();
-                for(int i = 0; i < 5; i++){
-                    System.out.println("Block " + (i+1) + ": " + student.getSeminar(i).getSessionName() + " (" + student.getSeminar(i).getSessionID() + ")");
+                //Once studentID is found print out corresponding name, email as well as all the seminars the student has with its corresponding time block
+                if(id != 0){
+                    Student student = students.get(id-1);
+                    System.out.println();
+                    System.out.println("Student Name: " + student.getName());
+                    System.out.println("Student Email: " + student.getEmail());
+                    System.out.println();
+                    for(int i = 0; i < 5; i++){
+                        System.out.println("Block " + (i+1) + ": " + student.getSeminar(i).getSessionName() + " (" + student.getSeminar(i).getSessionID() + ")");
+                    }
                 }
-                
             }
+            //if user inputs no, break and exit function
             else break;
         }
 
         
     }
-
-    public void printMasterSchedule(){
-        //Print out Session Name and all relevant information
-
-        for(int row = 0; row < 5; row++){
-            for(int col = 0; col < 5; col++){
-
-            }
-        }
-    }
-
+    /*
+     * printSessionRoster() prompts the user to search for seminar by sessionID or name 
+     * and then prints the corresponding seminar's roster of students and additional information
+     */
     public void printSessionRoster(){
         Scanner scan = new Scanner(System.in);
+        //Continuously asks if user wants to see another student's schedule until user responds with no
         while(true){
+            //User prompting and input validation
             System.out.println();
             System.out.println("Would you like to search up a seminar schedule? (Please respond with either yes or no)");
             String input = scan.nextLine();
+            //Input validation of yes or no
             while(!input.equals("yes") && !input.equals("y") && !input.equals("no") && !input.equals("n")){
                 System.out.println("Please respond with either yes or no");
                 input = scan.nextLine();
             }
 
+            //If user inputs yes then ask method of searching seminar by name or by id 
             if(input.equals("yes") || input.equals("y")){
                 System.out.println("Would you like to search up a seminar by name or by sessionID? Please enter \"name\" or \"id\": ");
                 input = scan.nextLine();
+                //Input validation of name or id
                 while(!input.equals("name") && !input.equals("id")){
                     System.out.println("Please respond with either \"name\" or \"id\"");
                     input = scan.nextLine();
                 }
                 int id;
+                //if by name then use binarySearchByName function to find sessionID and then print corresponding seminar
                 if(input.equals("name")){
                     System.out.println("Please enter the name you would like to search: ");
                     input = scan.nextLine();
+                    //Calling binarySearchByName() to find sessionID
                     id = binarySearchByName(input, 1);
+                    //User input validation
                     while(id == -1){
                         System.out.println("Match not found please enter a new name to search or press \"q\" to quit: ");
                         input = scan.nextLine();
-                        if(input.equals("q")) return;
+                        //User presses q then get out of current loop
+                        if(input.equals("q")) break;
+                        //Calling binarySearchByName() to find sessionID
                         id = binarySearchByName(input, 1);
                     }
+                    //increment id
                     id++;
                 }
+                //User prompts to search directly with sessionID
                 else{
+                    //Prompting
                     System.out.println("Please enter the sessionID you would like to search: ");
                     input = scan.nextLine();
+                    //User input validation
                     while(true){
+                        //Try block for parseInt
                         try {
                             id = Integer.parseInt(input);
+                            //Ensures an integer from 1-27 is passed
                             if(id < 1 || id > 27) System.out.println("Please enter a valid integer input for sessionID from 1-27");
                             else break;
                             input = scan.nextLine();
-                        } catch (NumberFormatException e) {
+                        }
+                        //Catch block for NumberFormatException 
+                        catch (NumberFormatException e) {
                             System.out.println("Please enter a valid integer input for student ID from 1-27");
                             input = scan.nextLine();
                         }
                     }
                 }
+                //Once sessionID is found print out corresponding session name, presenter name, ID as well as all the students the seminar has
+                if(id != 0){
+                    Seminar seminar = seminars.get(id-1);
+                    System.out.println();
+                    System.out.println("Seminar Name: " + seminar.getSessionName());
+                    System.out.println("Presenter Name: " + seminar.getPresenterName());
+                    System.out.println("Session ID: " + seminar.getSessionID());
+                    System.out.println();
 
-                Seminar seminar = seminars.get(id-1);
-                System.out.println();
-                System.out.println("Seminar Name: " + seminar.getSessionName());
-                System.out.println("Presenter Name: " + seminar.getPresenterName());
-                System.out.println("Session ID: " + seminar.getSessionID());
-                System.out.println();
-
-                System.out.println(seminar.getStudentsIndex());
-                System.out.println("Enrolled Students: ");
-                for(int i = 0; i < seminar.getStudentsIndex(); i++){
-                    System.out.println(seminar.getStudent(i).getName() + " (StudentID: " + seminar.getStudent(i).getStudentID() + ")");
+                    System.out.println("Enrolled Students: ");
+                    for(int i = 0; i < seminar.getStudentsIndex(); i++){
+                        System.out.println(seminar.getStudent(i).getName() + " (StudentID: " + seminar.getStudent(i).getStudentID() + ")");
+                    }
                 }
             }
+            //if user inputs no, break and exit function
             else break;
         }
     }
