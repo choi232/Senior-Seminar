@@ -33,8 +33,8 @@ public class SeniorSeminar {
         sortStudentsByPlacability();
         optimizeSchedule();
         sortByName();
-        //printMasterSchedule();
-        //printSessionRoster();
+        printMasterSchedule();
+        printSessionRoster();
         printStudentSchedule();
         
 
@@ -416,11 +416,18 @@ public class SeniorSeminar {
 
 
         }
+        //Print schedule
+        System.out.println();
+        for(int row = 0; row < 5; row++){
+            for(int col = 0; col < 5; col++){
+                if(col != 4) System.out.print(randomSchedule[row][col].getSessionID() + ",");
+                else System.out.print(randomSchedule[row][col].getSessionID()+"\n");
+            }
+        }
 
         try {
             //File title is optimization value + Schedules.csv so that data can be saved for any optimization value
             //Second argument true creates FileWriter as an appending FileWriter object so data can be saved and not overwritten
-            
             FileWriter myWriter;
             myWriter = new FileWriter("Saved Schedules/" + ((int)(optimizedCourseAvg*10)/10.0) + "Schedules.csv", true);
             for(int row = 0; row < 5; row++){
@@ -771,7 +778,66 @@ public class SeniorSeminar {
     }
 
     public void printSessionRoster(){
+        Scanner scan = new Scanner(System.in);
+        while(true){
+            System.out.println();
+            System.out.println("Would you like to search up a seminar schedule? (Please respond with either yes or no)");
+            String input = scan.nextLine();
+            while(!input.equals("yes") && !input.equals("y") && !input.equals("no") && !input.equals("n")){
+                System.out.println("Please respond with either yes or no");
+                input = scan.nextLine();
+            }
 
+            if(input.equals("yes") || input.equals("y")){
+                System.out.println("Would you like to search up a seminar by name or by sessionID? Please enter \"name\" or \"id\": ");
+                input = scan.nextLine();
+                while(!input.equals("name") && !input.equals("id")){
+                    System.out.println("Please respond with either \"name\" or \"id\"");
+                    input = scan.nextLine();
+                }
+                int id;
+                if(input.equals("name")){
+                    System.out.println("Please enter the name you would like to search: ");
+                    input = scan.nextLine();
+                    id = binarySearchByName(input, 1);
+                    while(id == -1){
+                        System.out.println("Match not found please enter a new name to search or press \"q\" to quit: ");
+                        input = scan.nextLine();
+                        if(input.equals("q")) return;
+                        id = binarySearchByName(input, 1);
+                    }
+                    id++;
+                }
+                else{
+                    System.out.println("Please enter the student ID you would like to search: ");
+                    input = scan.nextLine();
+                    while(true){
+                        try {
+                            id = Integer.parseInt(input);
+                            if(id < 1 || id > 27) System.out.println("Please enter a valid integer input for sessionID from 1-27");
+                            else break;
+                            input = scan.nextLine();
+                        } catch (NumberFormatException e) {
+                            System.out.println("Please enter a valid integer input for student ID from 1-27");
+                            input = scan.nextLine();
+                        }
+                    }
+                }
+
+                Seminar seminar = seminars.get(id-1);
+                System.out.println();
+                System.out.println("Seminar Name: " + seminar.getSessionName());
+                System.out.println("Presenter Name: " + seminar.getPresenterName());
+                System.out.println("Session ID: " + seminar.getSessionID());
+                System.out.println();
+
+                System.out.println("Enrolled Students: ");
+                for(int i = 0; i < 16; i++){
+                    System.out.println(seminar.getStudent(i).getName() + " (StudentID: " + seminar.getStudent(i).getStudentID() + ")");
+                }
+            }
+            else break;
+        }
     }
 
 
